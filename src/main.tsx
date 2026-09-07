@@ -6,6 +6,7 @@
 
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { ErrorBoundary } from './core/security/ErrorBoundary';
 import { StoreProvider } from './core/state/StoreContext';
 import App from './App';
@@ -22,6 +23,7 @@ createRoot(rootElement).render(
     <ErrorBoundary>
       <StoreProvider>
         <App />
+        <SpeedInsights />
       </StoreProvider>
     </ErrorBoundary>
   </StrictMode>
