@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import type { BlueprintContract } from '../../../domain/contracts/blueprint.contract';
-import type { RoadmapContract } from '../../../domain/contracts/roadmap.contract';
-import { generateIEEEMarkdown } from '../../../infrastructure/serialization/ieeeMarkdownExporter';
-import { SurfaceCard } from '../../design-system/SurfaceCard';
-import { CyberAction } from '../../design-system/CyberAction';
+import type { BlueprintContract } from '../../domain/contracts/blueprint.contract';
+import type { RoadmapContract } from '../../domain/contracts/roadmap.contract';
+import { generateIEEEMarkdown } from '../../infrastructure/serialization/ieeeMarkdownExporter';
+import { SurfaceCard } from '../design-system/SurfaceCard';
+import { CyberAction } from '../design-system/CyberAction';
 
 interface IEEEPrintPreviewModalProps {
   readonly blueprint: BlueprintContract;
@@ -61,7 +61,9 @@ export function IEEEPrintPreviewModal({ blueprint, roadmap, studentName, onClose
           <h2 style={{ margin: 0, color: '#333' }}>IEEE Print Preview</h2>
           <div style={{ display: 'flex', gap: '1rem' }}>
             <CyberAction variant="primary" onClick={() => window.print()}>Print / Save PDF</CyberAction>
-            <CyberAction variant="ghost" onClick={onClose} style={{ color: '#000', background: '#ccc' }}>Close</CyberAction>
+            <div style={{ display: 'inline-block', background: '#ccc', borderRadius: '8px' }}>
+              <CyberAction variant="ghost" onClick={onClose}>Close</CyberAction>
+            </div>
           </div>
         </div>
 

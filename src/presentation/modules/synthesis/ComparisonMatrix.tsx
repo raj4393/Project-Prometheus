@@ -48,14 +48,15 @@ export function ComparisonMatrix(): React.JSX.Element | null {
               ))}
             </div>
 
-            <CyberAction 
-              variant="outline" 
-              onClick={() => dispatch({ type: 'SET_BLUEPRINT', payload: bp })}
-              style={{ width: '100%', fontSize: '0.75rem', padding: '0.5rem' }}
-              ariaLabel={`Load ${bp.title}`}
-            >
-              Load Blueprint
-            </CyberAction>
+            <div style={{ width: '100%', fontSize: '0.75rem', padding: '0.5rem', textAlign: 'center' }}>
+              <CyberAction 
+                variant="secondary" 
+                onClick={() => dispatch({ type: 'SET_BLUEPRINT', payload: bp })}
+                ariaLabel={`Load ${bp.title}`}
+              >
+                Load Blueprint
+              </CyberAction>
+            </div>
           </div>
         ))}
       </div>

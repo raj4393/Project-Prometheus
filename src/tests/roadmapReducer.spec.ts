@@ -60,6 +60,7 @@ function createBaseState(roadmap: RoadmapContract | null = null): AppState {
     isGenerating: false,
     isAudioEnabled: false,
     presetBlueprints: [],
+    savedBlueprints: [],
   };
 }
 
