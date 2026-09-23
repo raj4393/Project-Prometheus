@@ -27,6 +27,8 @@ import { SprintChecklist } from './presentation/modules/roadmap/SprintChecklist'
 import { VivaSimulator } from './presentation/modules/defense/VivaSimulator';
 import { SurfaceCard } from './presentation/design-system/SurfaceCard';
 import { CyberAction } from './presentation/design-system/CyberAction';
+import { ComparisonMatrix } from './presentation/modules/synthesis/ComparisonMatrix';
+import { IEEEPrintPreviewModal } from './presentation/common/IEEEPrintPreviewModal';
 
 /**
  * Root application component rendering the Project Prometheus platform.
@@ -45,6 +47,7 @@ export default function App(): React.JSX.Element {
   const [ambition, setAmbition] = useState<AmbitionLevel>(AmbitionLevel.Ambitious);
   const [teamSize, setTeamSize] = useState(1);
   const [latency, setLatency] = useState<number | null>(null);
+  const [showIeeeModal, setShowIeeeModal] = useState(false);
 
   /**
    * Handles the project synthesis workflow.
@@ -416,11 +419,17 @@ export default function App(): React.JSX.Element {
                   <CyberAction variant="primary" onClick={handleDownloadSynopsis} ariaLabel="Download IEEE Synopsis as Markdown file">
                     📥 Download IEEE Synopsis (.md)
                   </CyberAction>
+                  <CyberAction variant="primary" onClick={() => setShowIeeeModal(true)} ariaLabel="Preview IEEE Document">
+                    🖨️ Print Preview
+                  </CyberAction>
                   <CyberAction variant="ghost" onClick={() => handleTabChange('roadmap')} ariaLabel="View development roadmap">
                     🗺️ View Roadmap
                   </CyberAction>
                   <CyberAction variant="ghost" onClick={() => handleTabChange('defense')} ariaLabel="Start viva defense practice">
                     🎤 Practice Defense
+                  </CyberAction>
+                  <CyberAction variant="secondary" onClick={() => dispatch({ type: 'SAVE_BLUEPRINT', payload: state.blueprint! })} ariaLabel="Save Blueprint to Comparison Matrix">
+                    💾 Save to Comparison
                   </CyberAction>
                 </div>
               </div>
@@ -497,6 +506,10 @@ export default function App(): React.JSX.Element {
                 ))}
               </div>
             </SurfaceCard>
+            
+            <div style={{ marginTop: '2rem' }}>
+              <ComparisonMatrix />
+            </div>
           </div>
         )}
 
@@ -538,6 +551,15 @@ export default function App(): React.JSX.Element {
         synthesisLatency={latency}
         blueprintCount={state.presetBlueprints.length + (state.blueprint ? 1 : 0)}
       />
+
+      {showIeeeModal && state.blueprint && (
+        <IEEEPrintPreviewModal 
+          blueprint={state.blueprint}
+          roadmap={state.roadmap}
+          studentName={state.profile?.studentName ?? 'Student'}
+          onClose={() => setShowIeeeModal(false)}
+        />
+      )}
     </div>
   );
 }

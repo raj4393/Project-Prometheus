@@ -5,7 +5,7 @@ import React from 'react';
  * progress bar, and phase-based grouping. Milestone states persist to localStorage.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import type { RoadmapContract } from '../../../domain/contracts/roadmap.contract';
 import { MilestoneState, computeCompletionPercentage } from '../../../domain/contracts/roadmap.contract';
 import { SurfaceCard } from '../../design-system/SurfaceCard';
@@ -47,11 +47,27 @@ export function SprintChecklist({ roadmap, onToggleMilestone }: SprintChecklistP
     [onToggleMilestone]
   );
 
+  const [viewMode, setViewMode] = useState<'checklist' | 'gantt'>('checklist');
+
   return (
     <SurfaceCard ariaLabel="12-week sprint checklist" as="section">
-      <h3 style={{ color: '#F0F4F8', fontSize: '1.125rem', fontWeight: 700, marginTop: 0, marginBottom: '0.5rem' }}>
-        📋 12-Week Development Roadmap
-      </h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h3 style={{ color: '#F0F4F8', fontSize: '1.125rem', fontWeight: 700, margin: 0 }}>
+          📋 12-Week Development Roadmap
+        </h3>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button 
+            onClick={() => setViewMode('checklist')}
+            style={{ padding: '0.5rem 1rem', borderRadius: '4px', background: viewMode === 'checklist' ? 'rgba(0, 217, 245, 0.2)' : 'rgba(255, 255, 255, 0.05)', color: viewMode === 'checklist' ? '#00D9F5' : '#94A3B8', border: 'none', cursor: 'pointer' }}>
+            Checklist
+          </button>
+          <button 
+            onClick={() => setViewMode('gantt')}
+            style={{ padding: '0.5rem 1rem', borderRadius: '4px', background: viewMode === 'gantt' ? 'rgba(0, 217, 245, 0.2)' : 'rgba(255, 255, 255, 0.05)', color: viewMode === 'gantt' ? '#00D9F5' : '#94A3B8', border: 'none', cursor: 'pointer' }}>
+            Gantt Timeline
+          </button>
+        </div>
+      </div>
 
       {/* Progress bar */}
       <div style={{ marginBottom: '1.5rem' }}>
@@ -93,8 +109,9 @@ export function SprintChecklist({ roadmap, onToggleMilestone }: SprintChecklistP
         </div>
       </div>
 
-      {/* Phase checklist */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Phase checklist or Gantt */}
+      {viewMode === 'checklist' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {roadmap.phases.map((phase, phaseIndex) => {
           const phaseColor = PHASE_COLORS[phaseIndex] ?? '#CBD5E1';
           const phaseCompleted = phase.milestones.filter(
@@ -182,7 +199,34 @@ export function SprintChecklist({ roadmap, onToggleMilestone }: SprintChecklistP
             </div>
           );
         })}
-      </div>
+        </div>
+      ) : (
+        <div style={{ overflowX: 'auto', paddingBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {roadmap.phases.map((phase, phaseIndex) => {
+            const phaseColor = PHASE_COLORS[phaseIndex] ?? '#CBD5E1';
+            return (
+              <div key={phase.label} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <h4 style={{ color: phaseColor, margin: 0, fontSize: '0.875rem' }}>{phase.label}</h4>
+                <div style={{ display: 'flex', gap: '1rem', minWidth: 'max-content' }}>
+                  {phase.milestones.map(milestone => {
+                    const isCompleted = milestone.state === MilestoneState.Completed;
+                    return (
+                      <div key={milestone.id} onClick={() => handleToggle(milestone.id)} style={{
+                        width: '200px', padding: '1rem', background: isCompleted ? 'rgba(0, 245, 160, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+                        borderLeft: `4px solid ${isCompleted ? '#00F5A0' : phaseColor}`, borderRadius: '4px', cursor: 'pointer',
+                        opacity: isCompleted ? 0.7 : 1
+                      }}>
+                        <div style={{ fontSize: '0.75rem', color: '#94A3B8', marginBottom: '0.25rem' }}>Week {milestone.weekNumber}</div>
+                        <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: isCompleted ? '#00F5A0' : '#F0F4F8' }}>{milestone.title}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </SurfaceCard>
   );
 }

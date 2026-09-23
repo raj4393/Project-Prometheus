@@ -47,6 +47,7 @@ const INITIAL_STATE: AppState = {
   isGenerating: false,
   isAudioEnabled: false,
   presetBlueprints: ALL_PRESET_BLUEPRINTS,
+  savedBlueprints: [],
 };
 
 /**

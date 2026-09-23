@@ -5,10 +5,18 @@ import React from 'react';
  * Shows at least 4 interactive viva questions with click-to-reveal model answers.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import type { DefenseContract } from '../../../domain/contracts/defense.contract';
 import { SurfaceCard } from '../../design-system/SurfaceCard';
 import { CyberAction } from '../../design-system/CyberAction';
+
+// Define SpeechRecognition types globally
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 /**
  * Props for the VivaSimulator component.
@@ -46,6 +54,58 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
     },
     [onToggleReveal]
   );
+
+  const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
+  const [transcripts, setTranscripts] = useState<Record<string, string>>({});
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const recognitionRef = useRef<any>(null);
+
+  const startRecording = useCallback((questionId: string, modelAnswer: string) => {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+    
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = true;
+    recognitionRef.current.interimResults = true;
+
+    recognitionRef.current.onresult = (event: any) => {
+      let currentTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        currentTranscript += event.results[i][0].transcript;
+      }
+      setTranscripts(prev => ({ ...prev, [questionId]: currentTranscript }));
+      
+      // Simple keyword matching score
+      const answerWords = modelAnswer.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+      const spokenWords = currentTranscript.toLowerCase().split(/\s+/);
+      const matches = answerWords.filter(w => spokenWords.some(sw => sw.includes(w))).length;
+      const score = answerWords.length > 0 ? Math.min(100, Math.round((matches / answerWords.length) * 100)) : 0;
+      setScores(prev => ({ ...prev, [questionId]: score }));
+    };
+
+    recognitionRef.current.onend = () => {
+      setActiveRecordingId(null);
+    };
+
+    setActiveRecordingId(questionId);
+    setTranscripts(prev => ({ ...prev, [questionId]: '' }));
+    setScores(prev => ({ ...prev, [questionId]: 0 }));
+    recognitionRef.current.start();
+  }, []);
+
+  const stopRecording = useCallback(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setActiveRecordingId(null);
+    }
+  }, []);
 
   return (
     <SurfaceCard ariaLabel="Viva voce defense simulator" as="section">
@@ -139,7 +199,7 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
                     {question.question}
                   </p>
                 </div>
-
+                
                 {/* Expand icon */}
                 <span
                   style={{
@@ -188,6 +248,31 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
                     <p style={{ color: '#94A3B8', fontSize: '0.8125rem', margin: '0.375rem 0 0 0' }}>
                       {question.scoringRubric}
                     </p>
+                  </div>
+
+                  <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ fontSize: '0.8125rem', color: '#F0F4F8', fontWeight: 600 }}>Practice Your Answer</span>
+                      {activeRecordingId === question.id ? (
+                        <button onClick={(e) => { e.stopPropagation(); stopRecording(); }} style={{ background: '#EF4444', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                          ⏹ Stop
+                        </button>
+                      ) : (
+                        <button onClick={(e) => { e.stopPropagation(); startRecording(question.id, question.modelAnswer); }} style={{ background: 'rgba(0, 217, 245, 0.2)', color: '#00D9F5', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                          🎤 Start Recording
+                        </button>
+                      )}
+                    </div>
+                    {transcripts[question.id] !== undefined && (
+                      <div style={{ fontSize: '0.8125rem', color: '#94A3B8', fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '4px' }}>
+                        "{transcripts[question.id]}"
+                      </div>
+                    )}
+                    {scores[question.id] !== undefined && (
+                      <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: scores[question.id] > 50 ? '#00F5A0' : '#F59E0B' }}>
+                        Keyword Match Score: {scores[question.id]}%
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

@@ -49,6 +49,7 @@ export interface AppState {
   readonly isGenerating: boolean;
   readonly isAudioEnabled: boolean;
   readonly presetBlueprints: ReadonlyArray<BlueprintContract>;
+  readonly savedBlueprints: ReadonlyArray<BlueprintContract>;
 }
 
 /**
@@ -66,6 +67,8 @@ export type AppAction =
   | { readonly type: 'SET_GENERATING'; readonly payload: boolean }
   | { readonly type: 'LOAD_PRESETS'; readonly payload: ReadonlyArray<BlueprintContract> }
   | { readonly type: 'SELECT_PRESET'; readonly payload: BlueprintContract }
+  | { readonly type: 'SAVE_BLUEPRINT'; readonly payload: BlueprintContract }
+  | { readonly type: 'REMOVE_SAVED_BLUEPRINT'; readonly payload: string }
   | { readonly type: 'TOGGLE_AUDIO' }
   | { readonly type: 'RESET' };
 
@@ -199,6 +202,16 @@ export function projectReducer(state: AppState, action: AppAction): AppState {
     case 'SELECT_PRESET':
       return { ...state, blueprint: action.payload, activeTab: 'blueprint' };
 
+    case 'SAVE_BLUEPRINT':
+      if (state.savedBlueprints.some(bp => bp.slug === action.payload.slug)) return state;
+      return { ...state, savedBlueprints: [...state.savedBlueprints, action.payload] };
+
+    case 'REMOVE_SAVED_BLUEPRINT':
+      return { 
+        ...state, 
+        savedBlueprints: state.savedBlueprints.filter(bp => bp.slug !== action.payload) 
+      };
+
     case 'TOGGLE_AUDIO':
       return { ...state, isAudioEnabled: !state.isAudioEnabled };
 
@@ -212,6 +225,7 @@ export function projectReducer(state: AppState, action: AppAction): AppState {
         activeTab: 'intake',
         isGenerating: false,
         isAudioEnabled: false,
+        savedBlueprints: [],
       };
 
     default:
