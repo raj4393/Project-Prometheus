@@ -79,113 +79,134 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0.75rem 1.5rem',
-        background: 'rgba(11, 18, 32, 0.9)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
+        height: '3.5rem', /* h-14 */
+        padding: '0 1.5rem', /* px-6 */
+        background: '#090a0f',
+        borderBottom: '1px solid #1e2230',
         position: 'sticky',
         top: 0,
         zIndex: 100,
         fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-        {/* Top Tier */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.75rem' }}>
-          {/* Branding */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.375rem', animation: 'pulse-dot 2s infinite' }} aria-hidden="true">🔥</span>
-            <div>
-              <h1 style={{
-                fontSize: '1rem',
-                fontWeight: 800,
-                margin: 0,
-                background: 'linear-gradient(135deg, #00F5A0, #00D9F5)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                letterSpacing: '-0.01em',
-              }}>
-                PROMETHEUS
-              </h1>
-              <span style={{ color: '#64748B', fontSize: '0.625rem', fontWeight: 500, letterSpacing: '0.06em' }}>
-                CAPSTONE OS
-              </span>
-            </div>
-          </div>
+      {/* Left: Minimalist logo & Badge */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <span style={{ fontSize: '1rem', color: '#f3f4f6' }} aria-hidden="true">◆</span>
+        <h1 style={{
+          fontSize: '0.875rem', /* text-sm */
+          fontWeight: 600,
+          margin: 0,
+          color: '#f3f4f6',
+          letterSpacing: '0.05em', /* tracking-wider */
+        }}>
+          PROMETHEUS
+        </h1>
+        <span style={{ 
+          color: '#94a3b8', 
+          fontSize: '0.625rem', 
+          fontWeight: 500, 
+          padding: '0.125rem 0.375rem', 
+          borderRadius: '4px',
+          background: '#11131a',
+          border: '1px solid #1e2230'
+        }}>
+          v1.0 Capstone OS
+        </span>
+      </div>
 
-          {/* Readiness Meter */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(255,255,255,0.03)', padding: '0.25rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.05)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-              <span style={{ fontSize: '0.5rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Readiness</span>
-              <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: readinessScore >= 80 ? '#10B981' : readinessScore >= 50 ? '#3B82F6' : '#F59E0B' }}>
-                {readinessScore}%
-              </span>
-            </div>
-            <div style={{ width: '80px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{ width: `${readinessScore}%`, height: '100%', background: readinessScore >= 80 ? '#10B981' : readinessScore >= 50 ? '#3B82F6' : '#F59E0B', transition: 'width 0.5s ease' }} />
-            </div>
-          </div>
+      {/* Center: Segmented Progress Bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }} role="tablist">
+        {NAV_TABS.map((tab, index) => {
+          const isActive = activeTab === tab.id;
+          const isPassed = NAV_TABS.findIndex(t => t.id === activeTab) > index;
+          return (
+            <React.Fragment key={tab.id}>
+              <button
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => handleTabClick(tab.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  padding: '0.375rem 0.75rem',
+                  borderRadius: '6px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  fontWeight: isActive ? 500 : 400,
+                  color: isActive ? '#06b6d4' : isPassed ? '#94a3b8' : '#64748b',
+                  background: isActive ? 'rgba(6, 182, 212, 0.1)' : 'transparent',
+                  transition: 'all 0.2s ease',
+                  borderBottom: isActive ? '2px solid #06b6d4' : '2px solid transparent',
+                  borderBottomLeftRadius: isActive ? '0' : '6px',
+                  borderBottomRightRadius: isActive ? '0' : '6px',
+                }}
+              >
+                <span style={{ color: isPassed ? '#10b981' : 'inherit' }}>
+                  {isPassed ? '✓' : `${index + 1}.`}
+                </span>
+                <span className="hide-on-mobile">{tab.label}</span>
+              </button>
+              {index < NAV_TABS.length - 1 && (
+                <span style={{ color: '#1e2230', fontSize: '0.75rem' }}>›</span>
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
 
-          {/* Quick Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <button onClick={onLoadDemo} title="Load Demo Data" style={{ background: 'transparent', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#8B5CF6', borderRadius: '8px', padding: '0.375rem', cursor: 'pointer' }}>🚀</button>
-            <button onClick={onExportProject} title="Export Backup" style={{ background: 'transparent', border: '1px solid rgba(0, 245, 160, 0.3)', color: '#00F5A0', borderRadius: '8px', padding: '0.375rem', cursor: 'pointer' }}>⬇️</button>
-            <label title="Import JSON" style={{ background: 'transparent', border: '1px solid rgba(0, 217, 245, 0.3)', color: '#00D9F5', borderRadius: '8px', padding: '0.375rem', cursor: 'pointer', display: 'flex' }}>
-              ⬆️<input type="file" accept=".json" onChange={onImportProject} style={{ display: 'none' }} />
-            </label>
-            <button onClick={onToggleAudio} title="Toggle Audio" style={{ background: 'transparent', border: 'none', color: isAudioEnabled ? '#00D9F5' : '#64748B', cursor: 'pointer', padding: '0.375rem' }}>
-              {isAudioEnabled ? '🔊' : '🔇'}
-            </button>
-            <MetricsBadge label="Engine" status={mapEngineStatusToBadge(engineStatus)} value={engineStatus} />
-          </div>
+      {/* Right: Action Group */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        {/* Readiness Badge */}
+        <div style={{ 
+          display: 'flex', alignItems: 'center', gap: '0.375rem', 
+          background: '#11131a', border: '1px solid #1e2230', 
+          padding: '0.25rem 0.5rem', borderRadius: '9999px',
+          fontSize: '0.75rem', color: '#f3f4f6'
+        }}>
+          <div style={{ 
+            width: '8px', height: '8px', borderRadius: '50%', 
+            background: readinessScore >= 80 ? '#10b981' : readinessScore >= 50 ? '#06b6d4' : '#F59E0B' 
+          }} />
+          <span>Readiness: {readinessScore}%</span>
         </div>
 
-        {/* Bottom Tier (Stepper) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', justifyContent: 'center', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' }} role="tablist">
-          {NAV_TABS.map((tab, index) => {
-            const isActive = activeTab === tab.id;
-            const isPassed = NAV_TABS.findIndex(t => t.id === activeTab) > index;
-            return (
-              <React.Fragment key={tab.id}>
-                <button
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => handleTabClick(tab.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.375rem',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '20px',
-                    border: isActive ? '1px solid rgba(0, 217, 245, 0.5)' : '1px solid transparent',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem',
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? '#00D9F5' : isPassed ? '#10B981' : '#64748B',
-                    background: isActive ? 'rgba(0, 217, 245, 0.05)' : 'transparent',
-                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                    boxShadow: isActive ? '0 0 10px rgba(0, 217, 245, 0.2)' : 'none',
-                  }}
-                >
-                  <span style={{ 
-                    width: '20px', height: '20px', borderRadius: '50%', 
-                    background: isPassed ? '#10B981' : isActive ? '#00D9F5' : 'rgba(255,255,255,0.1)', 
-                    color: isPassed || isActive ? '#000' : '#FFF', 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold' 
-                  }}>
-                    {isPassed ? '✓' : index + 1}
-                  </span>
-                  <span className="hide-on-mobile">{tab.label}</span>
-                </button>
-                {index < NAV_TABS.length - 1 && (
-                  <div style={{ width: '40px', height: '2px', background: isPassed ? '#10B981' : 'rgba(255,255,255,0.1)' }} />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
+        {/* Ghost Buttons */}
+        <label style={{ color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '4px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }}>
+          Import
+          <input type="file" accept=".json" onChange={onImportProject} style={{ display: 'none' }} />
+        </label>
+        <button onClick={onExportProject} style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '4px', transition: 'all 0.2s' }}>
+          Export JSON
+        </button>
+        <button onClick={onLoadDemo} style={{ background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.3)', color: '#06b6d4', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', padding: '0.25rem 0.75rem', borderRadius: '4px', transition: 'all 0.2s' }}>
+          Load Demo
+        </button>
+        
+        {/* Helper Badge */}
+        <kbd style={{ background: '#11131a', border: '1px solid #1e2230', padding: '2px 6px', borderRadius: '4px', fontSize: '0.625rem', color: '#64748b' }}>
+          P Preview
+        </kbd>
+
+        <button
+          onClick={onToggleAudio}
+          aria-label={isAudioEnabled ? "Mute sounds" : "Unmute sounds"}
+          title={isAudioEnabled ? "Mute sounds" : "Unmute sounds"}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: isAudioEnabled ? '#94a3b8' : '#64748b',
+            cursor: 'pointer',
+            fontSize: '1rem',
+            padding: '0.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          {isAudioEnabled ? '🔊' : '🔇'}
+        </button>
       </div>
     </nav>
   );

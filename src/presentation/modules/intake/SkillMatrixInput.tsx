@@ -3,7 +3,7 @@ import { ProficiencyLevel, type SkillTag, type SkillEntry } from '../../../domai
 import { CyberAction } from '../../design-system/CyberAction';
 import { SurfaceCard } from '../../design-system/SurfaceCard';
 
-const SKILL_GROUPS = [
+export const SKILL_GROUPS = [
   { category: 'Languages', skills: ['Python', 'Java', 'C', 'C++', 'C#', 'TypeScript', 'JavaScript', 'Go', 'Rust', 'Kotlin', 'Swift', 'PHP', 'SQL', 'Solidity', 'R'] },
   { category: 'Web & Mobile', skills: ['React', 'Next.js', 'Vue.js', 'Angular', 'Svelte', 'Tailwind CSS', 'Flutter', 'React Native'] },
   { category: 'Backend & Microservices', skills: ['Node.js', 'Express.js', 'FastAPI', 'Django', 'Flask', 'Spring Boot', 'GraphQL', 'gRPC', 'WebSockets'] },
@@ -204,19 +204,6 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
             </div>
           </div>
         ))}
-      </div>
-
-      <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {isFullStack && (
-          <div style={{ padding: '0.5rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '6px', color: '#10B981', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '1rem' }}>✅</span> Stack Completeness: Viable Full-Stack System Detected!
-          </div>
-        )}
-        {needsBackendForAI && (
-          <div style={{ padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', color: '#F59E0B', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span style={{ fontSize: '1rem' }}>💡</span> Recommended: Add FastAPI or Python backend for AI inference integration.
-          </div>
-        )}
       </div>
     </SurfaceCard>
   );

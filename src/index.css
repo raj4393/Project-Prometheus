@@ -9,26 +9,26 @@
 /* ---- CSS Custom Properties (Design Tokens) ---- */
 :root {
   /* Backgrounds */
-  --bg-deep-space: #0a0d14;
-  --bg-card: rgba(15, 23, 42, 0.6);
-  --bg-card-rgb: 15, 23, 42;
+  --bg-deep-space: #090a0f;
+  --bg-card: #11131a;
+  --bg-card-hover: #161922;
 
   /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.16);
+  --border-subtle: #1e2230;
+  --border-hover: #2b3145;
 
-  /* Neon Accents */
-  --accent-emerald: #00F5A0;
-  --accent-cyan: #00D9F5;
+  /* Neon Accents (Linear/Raycast inspired) */
+  --accent-emerald: #10b981;
+  --accent-cyan: #06b6d4;
   --accent-violet: #8B5CF6;
   --accent-amber: #F59E0B;
   --accent-rose: #EC4899;
 
-  /* Text — AAA contrast against #05070E */
-  --text-primary: #F0F4F8;
-  --text-body: #CBD5E1;     /* 7.8:1 contrast ratio on #05070E */
-  --text-muted: #94A3B8;
-  --text-dim: #64748B;
+  /* Text */
+  --text-primary: #f3f4f6;
+  --text-body: #94a3b8;
+  --text-muted: #64748b;
+  --text-dim: #475569;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -82,17 +82,9 @@ body {
   overflow-x: hidden;
 }
 
-/* Subtle grid background pattern */
+/* Removed glowing grid background pattern to reduce visual noise */
 body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    radial-gradient(circle at 25% 25%, rgba(0, 245, 160, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(0, 217, 245, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.02) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
+  display: none;
 }
 
 #root {
@@ -144,8 +136,8 @@ select {
 }
 
 select option {
-  background: #0B1220;
-  color: #F0F4F8;
+  background: var(--bg-card);
+  color: var(--text-primary);
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -172,35 +164,33 @@ input[type="number"]::-webkit-outer-spin-button {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* ---- Surface Card Hover ---- */
+/* ---- Surface Card (Linear-inspired) ---- */
 .surface-card {
   background: var(--bg-card);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(30, 41, 59, 0.8);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  border-radius: 1rem;
-  transition: all 300ms var(--ease-out);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: all 200ms var(--ease-out);
 }
 
 .surface-card:hover {
-  border-color: rgba(0, 217, 245, 0.3);
-  box-shadow: 0 4px 24px rgba(0, 217, 245, 0.1);
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
 .telemetry-footer {
   position: sticky;
   bottom: 0;
   z-index: 100;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: #0c0e14;
+  border-top: 1px solid #1e2230;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1.5rem;
   font-size: 0.75rem;
-  color: #94A3B8;
+  color: #94a3b8;
 }
 
 .animate-fadeIn {
