@@ -90,145 +90,102 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
         fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
       }}
     >
-      {/* Branding */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <span style={{ fontSize: '1.375rem' }} aria-hidden="true">🔥</span>
-        <div>
-          <h1 style={{
-            fontSize: '1rem',
-            fontWeight: 800,
-            margin: 0,
-            background: 'linear-gradient(135deg, #00F5A0, #00D9F5)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            letterSpacing: '-0.01em',
-          }}>
-            PROMETHEUS
-          </h1>
-          <span style={{ color: '#64748B', fontSize: '0.625rem', fontWeight: 500, letterSpacing: '0.06em' }}>
-            CAPSTONE COMPILER
-          </span>
-        </div>
-      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+        {/* Top Tier */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '0.75rem' }}>
+          {/* Branding */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <span style={{ fontSize: '1.375rem', animation: 'pulse-dot 2s infinite' }} aria-hidden="true">🔥</span>
+            <div>
+              <h1 style={{
+                fontSize: '1rem',
+                fontWeight: 800,
+                margin: 0,
+                background: 'linear-gradient(135deg, #00F5A0, #00D9F5)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                letterSpacing: '-0.01em',
+              }}>
+                PROMETHEUS
+              </h1>
+              <span style={{ color: '#64748B', fontSize: '0.625rem', fontWeight: 500, letterSpacing: '0.06em' }}>
+                CAPSTONE OS
+              </span>
+            </div>
+          </div>
 
-      {/* 5-Phase Stepper */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center' }} role="tablist" aria-label="Application stepper">
-        {NAV_TABS.map((tab, index) => {
-          const isActive = activeTab === tab.id;
-          const isPassed = NAV_TABS.findIndex(t => t.id === activeTab) > index;
-          return (
-            <React.Fragment key={tab.id}>
-              <button
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`panel-${tab.id}`}
-                onClick={() => handleTabClick(tab.id)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.375rem',
-                  padding: '0.5rem 0.75rem',
-                  borderRadius: '20px',
-                  border: isActive ? '1px solid #00F5A0' : '1px solid transparent',
-                  cursor: 'pointer',
-                  fontSize: '0.75rem',
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? '#00F5A0' : isPassed ? '#00D9F5' : '#64748B',
-                  background: isActive ? 'rgba(0, 245, 160, 0.08)' : 'transparent',
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                <span style={{ 
-                  width: '20px', height: '20px', borderRadius: '50%', 
-                  background: isPassed ? '#00D9F5' : isActive ? '#00F5A0' : 'rgba(255,255,255,0.1)', 
-                  color: isPassed || isActive ? '#000' : '#FFF', 
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold' 
-                }}>
-                  {isPassed ? '✓' : index + 1}
-                </span>
-                <span className="hide-on-mobile">{tab.label}</span>
-              </button>
-              {index < NAV_TABS.length - 1 && (
-                <div style={{ width: '30px', height: '2px', background: isPassed ? '#00D9F5' : 'rgba(255,255,255,0.1)' }} />
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
+          {/* Readiness Meter */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'rgba(255,255,255,0.03)', padding: '0.25rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+              <span style={{ fontSize: '0.5rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Readiness</span>
+              <span style={{ fontSize: '0.8125rem', fontWeight: 800, color: readinessScore >= 80 ? '#10B981' : readinessScore >= 50 ? '#3B82F6' : '#F59E0B' }}>
+                {readinessScore}%
+              </span>
+            </div>
+            <div style={{ width: '80px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ width: `${readinessScore}%`, height: '100%', background: readinessScore >= 80 ? '#10B981' : readinessScore >= 50 ? '#3B82F6' : '#F59E0B', transition: 'width 0.5s ease' }} />
+            </div>
+          </div>
 
-      {/* Readiness Meter */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginRight: '1rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <span style={{ fontSize: '0.625rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Readiness</span>
-          <span style={{ fontSize: '0.875rem', fontWeight: 800, color: readinessScore >= 80 ? '#00F5A0' : readinessScore >= 50 ? '#00D9F5' : '#F59E0B' }}>
-            {readinessScore}%
-          </span>
+          {/* Quick Actions */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <button onClick={onLoadDemo} title="Load Demo Data" style={{ background: 'transparent', border: '1px solid rgba(139, 92, 246, 0.3)', color: '#8B5CF6', borderRadius: '8px', padding: '0.375rem', cursor: 'pointer' }}>🚀</button>
+            <button onClick={onExportProject} title="Export Backup" style={{ background: 'transparent', border: '1px solid rgba(0, 245, 160, 0.3)', color: '#00F5A0', borderRadius: '8px', padding: '0.375rem', cursor: 'pointer' }}>⬇️</button>
+            <label title="Import JSON" style={{ background: 'transparent', border: '1px solid rgba(0, 217, 245, 0.3)', color: '#00D9F5', borderRadius: '8px', padding: '0.375rem', cursor: 'pointer', display: 'flex' }}>
+              ⬆️<input type="file" accept=".json" onChange={onImportProject} style={{ display: 'none' }} />
+            </label>
+            <button onClick={onToggleAudio} title="Toggle Audio" style={{ background: 'transparent', border: 'none', color: isAudioEnabled ? '#00D9F5' : '#64748B', cursor: 'pointer', padding: '0.375rem' }}>
+              {isAudioEnabled ? '🔊' : '🔇'}
+            </button>
+            <MetricsBadge label="Engine" status={mapEngineStatusToBadge(engineStatus)} value={engineStatus} />
+          </div>
         </div>
-        <div style={{ width: '60px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
-          <div style={{ width: `${readinessScore}%`, height: '100%', background: readinessScore >= 80 ? '#00F5A0' : readinessScore >= 50 ? '#00D9F5' : '#F59E0B', transition: 'width 0.5s ease' }} />
-        </div>
-      </div>
 
-      {/* Right controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <button
-          onClick={onExportProject}
-          style={{ background: 'transparent', border: '1px solid rgba(0, 245, 160, 0.3)', color: '#00F5A0', borderRadius: '4px', padding: '0.375rem 0.75rem', fontSize: '0.6875rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease' }}
-          title="Export Project (.json)"
-        >
-          ⬇️ Export
-        </button>
-        <label
-          style={{ background: 'transparent', border: '1px solid rgba(0, 217, 245, 0.3)', color: '#00D9F5', borderRadius: '4px', padding: '0.375rem 0.75rem', fontSize: '0.6875rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center' }}
-          title="Import Project (.json)"
-        >
-          ⬆️ Import
-          <input type="file" accept=".json" onChange={onImportProject} style={{ display: 'none' }} />
-        </label>
-        <button
-          onClick={onLoadDemo}
-          style={{
-            background: 'rgba(139, 92, 246, 0.15)',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            color: '#8B5CF6',
-            borderRadius: '6px',
-            padding: '0.375rem 0.75rem',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          🚀 Load Demo
-        </button>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.625rem', color: '#00F5A0', background: 'rgba(0, 245, 160, 0.1)', padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
-          <span aria-hidden="true">💾</span> Auto-saved
+        {/* Bottom Tier (Stepper) */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', justifyContent: 'center', paddingTop: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)' }} role="tablist">
+          {NAV_TABS.map((tab, index) => {
+            const isActive = activeTab === tab.id;
+            const isPassed = NAV_TABS.findIndex(t => t.id === activeTab) > index;
+            return (
+              <React.Fragment key={tab.id}>
+                <button
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => handleTabClick(tab.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.375rem',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '20px',
+                    border: isActive ? '1px solid rgba(0, 217, 245, 0.5)' : '1px solid transparent',
+                    cursor: 'pointer',
+                    fontSize: '0.75rem',
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? '#00D9F5' : isPassed ? '#10B981' : '#64748B',
+                    background: isActive ? 'rgba(0, 217, 245, 0.05)' : 'transparent',
+                    transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    boxShadow: isActive ? '0 0 10px rgba(0, 217, 245, 0.2)' : 'none',
+                  }}
+                >
+                  <span style={{ 
+                    width: '20px', height: '20px', borderRadius: '50%', 
+                    background: isPassed ? '#10B981' : isActive ? '#00D9F5' : 'rgba(255,255,255,0.1)', 
+                    color: isPassed || isActive ? '#000' : '#FFF', 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold' 
+                  }}>
+                    {isPassed ? '✓' : index + 1}
+                  </span>
+                  <span className="hide-on-mobile">{tab.label}</span>
+                </button>
+                {index < NAV_TABS.length - 1 && (
+                  <div style={{ width: '40px', height: '2px', background: isPassed ? '#10B981' : 'rgba(255,255,255,0.1)' }} />
+                )}
+              </React.Fragment>
+            );
+          })}
         </div>
-        <button
-          onClick={onToggleAudio}
-          aria-label={isAudioEnabled ? "Mute sounds" : "Unmute sounds"}
-          title={isAudioEnabled ? "Mute sounds" : "Unmute sounds"}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: isAudioEnabled ? '#00D9F5' : '#64748B',
-            cursor: 'pointer',
-            fontSize: '1.25rem',
-            padding: '0.25rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'color 0.2s ease',
-          }}
-        >
-          {isAudioEnabled ? '🔊' : '🔇'}
-        </button>
-        <MetricsBadge
-          label="Engine"
-          status={mapEngineStatusToBadge(engineStatus)}
-          value={engineStatus}
-        />
       </div>
     </nav>
   );
