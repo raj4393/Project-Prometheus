@@ -18,6 +18,14 @@ const TIER_COLORS: Record<string, string> = {
 
 export function ArchitectureVisualizer({ blueprint }: ArchitectureVisualizerProps): React.JSX.Element {
   const [activeNode, setActiveNode] = useState<TechStackEntry | null>(null);
+  const [simulatedFailure, setSimulatedFailure] = useState<string | null>(null);
+
+  const getMockDetails = (node: TechStackEntry) => ({
+    protocol: node.tier === StackTier.Presentation ? 'HTTPS / WebSocket' : node.tier === StackTier.Logic ? 'gRPC / REST' : 'TCP / Binary',
+    sla: node.tier === StackTier.Presentation ? '99.9%' : '99.99%',
+    contracts: 'JSON / Protobuf',
+    mitigation: 'Implement Circuit Breaker, enable retries, and fallback to degraded functionality.'
+  });
 
   // Group tech stack by tier
   const tiers: Record<string, TechStackEntry[]> = {};
@@ -56,6 +64,14 @@ export function ArchitectureVisualizer({ blueprint }: ArchitectureVisualizerProp
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
         {/* SVG Canvas */}
         <div style={{ flex: 1, minWidth: '600px', background: 'rgba(5,7,14,0.4)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', padding: '1rem', overflowX: 'auto' }}>
+          <style>{`
+            @keyframes pulse-red {
+              0% { stroke-width: 2; opacity: 1; }
+              50% { stroke-width: 6; stroke: #EF4444; opacity: 0.6; }
+              100% { stroke-width: 2; opacity: 1; }
+            }
+            .pulse-anim { animation: pulse-red 1.2s infinite; }
+          `}</style>
           <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
             {/* Draw connections first */}
             {tiers[StackTier.Presentation].map((n1, i1) => {
@@ -95,11 +111,12 @@ export function ArchitectureVisualizer({ blueprint }: ArchitectureVisualizerProp
               return nodes.map((node, rowIndex) => {
                 const cy = (height / (nodes.length + 1)) * (rowIndex + 1);
                 const isHovered = activeNode?.name === node.name;
-                const color = TIER_COLORS[tier];
+                const isFailed = simulatedFailure === node.name;
+                const color = isFailed ? '#EF4444' : TIER_COLORS[tier];
                 
                 return (
                   <g key={node.name} style={{ cursor: 'pointer', transition: 'all 0.3s' }} onMouseEnter={() => setActiveNode(node)} onClick={() => setActiveNode(node)}>
-                    <circle cx={cx} cy={cy} r={isHovered ? nodeRadius + 5 : nodeRadius} fill="rgba(5,7,14,0.8)" stroke={color} strokeWidth={isHovered ? 3 : 2} />
+                    <circle cx={cx} cy={cy} r={isHovered ? nodeRadius + 5 : nodeRadius} fill="rgba(5,7,14,0.8)" stroke={color} strokeWidth={isHovered ? 3 : 2} className={isFailed ? 'pulse-anim' : ''} strokeDasharray={isFailed ? '4 4' : '0'} />
                     <text x={cx} y={cy - 45} fill="#F0F4F8" fontSize="12" textAnchor="middle" fontWeight={isHovered ? 'bold' : 'normal'}>
                       {node.name.length > 15 ? node.name.substring(0, 12) + '...' : node.name}
                     </text>
@@ -120,19 +137,53 @@ export function ArchitectureVisualizer({ blueprint }: ArchitectureVisualizerProp
           </svg>
         </div>
 
-        {/* Info Panel */}
-        <div style={{ flex: '0 0 250px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+        {/* Info Panel Drawer */}
+        <div style={{ flex: '0 0 280px', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '12px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)' }}>
           {activeNode ? (
             <div>
-              <span style={{ fontSize: '0.6875rem', fontWeight: 600, padding: '0.125rem 0.5rem', borderRadius: '4px', background: `${TIER_COLORS[activeNode.tier]}20`, color: TIER_COLORS[activeNode.tier] }}>
-                {activeNode.tier}
-              </span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '0.6875rem', fontWeight: 600, padding: '0.125rem 0.5rem', borderRadius: '4px', background: `${TIER_COLORS[activeNode.tier]}20`, color: TIER_COLORS[activeNode.tier] }}>
+                  {activeNode.tier}
+                </span>
+                <button 
+                  onClick={() => setSimulatedFailure(simulatedFailure === activeNode.name ? null : activeNode.name)}
+                  style={{ background: simulatedFailure === activeNode.name ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255,255,255,0.05)', color: simulatedFailure === activeNode.name ? '#EF4444' : '#CBD5E1', border: 'none', borderRadius: '4px', padding: '4px 8px', fontSize: '0.6875rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                  {simulatedFailure === activeNode.name ? 'Stop Sim' : '⚡ Simulate Failure'}
+                </button>
+              </div>
               <h4 style={{ color: '#F0F4F8', fontSize: '1.125rem', marginTop: '0.75rem', marginBottom: '0.5rem' }}>{activeNode.name}</h4>
-              <p style={{ color: '#94A3B8', fontSize: '0.875rem', lineHeight: 1.6 }}>{activeNode.rationale}</p>
+              <p style={{ color: '#94A3B8', fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1rem' }}>{activeNode.rationale}</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1rem', background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '6px' }}>
+                <div>
+                  <div style={{ fontSize: '0.625rem', color: '#64748B', textTransform: 'uppercase' }}>Protocol</div>
+                  <div style={{ fontSize: '0.75rem', color: '#CBD5E1', fontWeight: 600 }}>{getMockDetails(activeNode).protocol}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.625rem', color: '#64748B', textTransform: 'uppercase' }}>Target SLA</div>
+                  <div style={{ fontSize: '0.75rem', color: '#00F5A0', fontWeight: 600 }}>{getMockDetails(activeNode).sla}</div>
+                </div>
+                <div style={{ gridColumn: 'span 2', marginTop: '0.25rem' }}>
+                  <div style={{ fontSize: '0.625rem', color: '#64748B', textTransform: 'uppercase' }}>Data Contracts</div>
+                  <div style={{ fontSize: '0.75rem', color: '#CBD5E1' }}>{getMockDetails(activeNode).contracts}</div>
+                </div>
+              </div>
+
+              {simulatedFailure === activeNode.name && (
+                <div style={{ padding: '0.75rem', border: '1px solid #EF4444', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.1)', animation: 'pulse-red 2s infinite' }}>
+                  <h5 style={{ color: '#EF4444', margin: '0 0 0.5rem 0', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    🚨 504 Timeout / Eviction
+                  </h5>
+                  <p style={{ color: '#F87171', fontSize: '0.75rem', margin: 0, lineHeight: 1.5 }}>
+                    <strong>Mitigation:</strong> {getMockDetails(activeNode).mitigation}
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: '#64748B', fontSize: '0.875rem' }}>
-              Hover or tap on a node to inspect technical rationale.
+              Tap on any node to inspect technical specs or run chaos simulations.
             </div>
           )}
         </div>

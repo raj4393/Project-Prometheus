@@ -170,15 +170,46 @@ export default function App(): React.JSX.Element {
     if (state.isAudioEnabled) playSuccess();
   }, [dispatch, state.isAudioEnabled]);
 
+  const handleExportProject = useCallback(() => {
+    const jsonStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `prometheus-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    if (state.isAudioEnabled) playSuccess();
+  }, [state]);
+
+  const handleImportProject = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const importedState = JSON.parse(event.target?.result as string);
+        dispatch({ type: 'RESTORE_STATE', payload: importedState });
+        if (state.isAudioEnabled) playSuccess();
+        alert('Project imported successfully!');
+      } catch (err) {
+        console.error("Invalid project file", err);
+        alert('Failed to parse project file.');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // Reset input
+  }, [dispatch, state.isAudioEnabled]);
+
   // Calculate Readiness Score
   let readinessScore = 0;
   if (state.activeTab !== 'intake') {
-    let completedPhases = 1; // Passed intake/lit
-    if (state.blueprint) completedPhases++;
-    if (state.roadmap && state.roadmap.completedMilestones > 0) completedPhases++;
-    if (state.defense && state.defense.questions.some(q => q.isRevealed)) completedPhases++;
-    if (state.facultyAssessment && state.facultyAssessment.review0?.remarks) completedPhases++;
-    readinessScore = Math.min(100, Math.round((completedPhases / 5) * 100));
+    const litScore = state.literature && state.literature.length >= 5 ? 25 : (state.literature?.length || 0) / 5 * 25;
+    const roadmapScore = state.roadmap && state.roadmap.totalMilestones > 0 ? (state.roadmap.completedMilestones / state.roadmap.totalMilestones) * 25 : 0;
+    const vivaCount = state.defense ? state.defense.questions.filter(q => q.isRevealed).length : 0;
+    const vivaScore = vivaCount >= 3 ? 25 : (vivaCount / 3) * 25;
+    const facultyScore = (state.facultyAssessment && state.facultyAssessment.review0?.remarks && state.facultyAssessment.review1?.remarks && state.facultyAssessment.review2?.remarks) ? 25 : 0;
+    readinessScore = Math.round(litScore + roadmapScore + vivaScore + facultyScore);
   }
 
   // Keyboard Shortcuts
@@ -212,6 +243,8 @@ export default function App(): React.JSX.Element {
         isAudioEnabled={state.isAudioEnabled}
         onToggleAudio={handleToggleAudio}
         onLoadDemo={handleLoadDemo}
+        onExportProject={handleExportProject}
+        onImportProject={handleImportProject}
         readinessScore={readinessScore}
       />
 

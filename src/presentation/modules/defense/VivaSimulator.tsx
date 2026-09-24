@@ -58,20 +58,103 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
   const [activeRecordingId, setActiveRecordingId] = useState<string | null>(null);
   const [transcripts, setTranscripts] = useState<Record<string, string>>({});
   const [scores, setScores] = useState<Record<string, number>>({});
+  const [latency, setLatency] = useState<Record<string, number>>({});
+  const [keywordBadges, setKeywordBadges] = useState<Record<string, { matched: string[], missing: string[] }>>({});
   const recognitionRef = useRef<any>(null);
+  
+  const audioContextRef = useRef<any>(null);
+  const analyserRef = useRef<any>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const sourceRef = useRef<any>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+
+  // Clean up AudioContext on unmount
+  React.useEffect(() => {
+    return () => {
+      stopAudioVisualizer();
+    };
+  }, []);
 
   const hasSpeechSupport = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
-  const calculateScore = (answer: string, spoken: string) => {
-    const answerWords = answer.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-    const spokenWords = spoken.toLowerCase().split(/\s+/);
-    const matches = answerWords.filter(w => spokenWords.some(sw => sw.includes(w))).length;
-    return answerWords.length > 0 ? Math.min(100, Math.round((matches / answerWords.length) * 100)) : 0;
+  const updateScoreAndKeywords = (questionId: string, modelAnswer: string, spoken: string) => {
+    const targetKeywords = Array.from(new Set(modelAnswer.toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 4)));
+    const spokenWords = spoken.toLowerCase().split(/[^a-z0-9]+/);
+    const matched = targetKeywords.filter(w => spokenWords.some(sw => sw.includes(w)));
+    const missing = targetKeywords.filter(w => !matched.includes(w));
+    
+    const score = targetKeywords.length > 0 ? Math.min(100, Math.round((matched.length / targetKeywords.length) * 100)) : 100;
+    setScores(prev => ({ ...prev, [questionId]: score }));
+    setKeywordBadges(prev => ({ ...prev, [questionId]: { matched, missing } }));
   };
 
   const handleManualInput = (questionId: string, modelAnswer: string, text: string) => {
     setTranscripts(prev => ({ ...prev, [questionId]: text }));
-    setScores(prev => ({ ...prev, [questionId]: calculateScore(modelAnswer, text) }));
+    updateScoreAndKeywords(questionId, modelAnswer, text);
+    
+    if (startTimeRef.current && !latency[questionId]) {
+      setLatency(prev => ({ ...prev, [questionId]: (Date.now() - startTimeRef.current!) / 1000 }));
+    }
+  };
+
+  const drawVisualizer = () => {
+    if (!canvasRef.current || !analyserRef.current || !dataArrayRef.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const draw = () => {
+      animationFrameRef.current = requestAnimationFrame(draw);
+      const dataArray = dataArrayRef.current;
+      if (!dataArray) return;
+      
+      analyserRef.current.getByteFrequencyData(dataArray);
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const barWidth = (canvas.width / dataArray.length) * 2.5;
+      let x = 0;
+      
+      for (let i = 0; i < dataArray.length; i++) {
+        const barHeight = dataArray[i] / 2;
+        ctx.fillStyle = `rgb(${barHeight + 100}, 217, 245)`;
+        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+        x += barWidth + 1;
+      }
+    };
+    draw();
+  };
+
+  const startAudioVisualizer = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 256;
+      const source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+      
+      audioContextRef.current = audioCtx;
+      analyserRef.current = analyser;
+      sourceRef.current = source;
+      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
+      
+      drawVisualizer();
+    } catch (err) {
+      console.error("Audio visualizer error", err);
+    }
+  };
+
+  const stopAudioVisualizer = () => {
+    if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+    if (sourceRef.current) {
+      sourceRef.current.mediaStream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+      sourceRef.current.disconnect();
+    }
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close();
+    }
   };
 
   const startRecording = useCallback((questionId: string, modelAnswer: string) => {
@@ -95,25 +178,32 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
         currentTranscript += event.results[i][0].transcript;
       }
       setTranscripts(prev => ({ ...prev, [questionId]: currentTranscript }));
+      updateScoreAndKeywords(questionId, modelAnswer, currentTranscript);
       
-      const score = calculateScore(modelAnswer, currentTranscript);
-      setScores(prev => ({ ...prev, [questionId]: score }));
+      if (startTimeRef.current && !latency[questionId]) {
+        setLatency(prev => ({ ...prev, [questionId]: (Date.now() - startTimeRef.current!) / 1000 }));
+      }
     };
 
     recognitionRef.current.onend = () => {
       setActiveRecordingId(null);
+      stopAudioVisualizer();
     };
 
     setActiveRecordingId(questionId);
+    startTimeRef.current = Date.now();
     setTranscripts(prev => ({ ...prev, [questionId]: '' }));
     setScores(prev => ({ ...prev, [questionId]: 0 }));
+    setKeywordBadges(prev => ({ ...prev, [questionId]: { matched: [], missing: [] } }));
     recognitionRef.current.start();
-  }, []);
+    startAudioVisualizer();
+  }, [latency]);
 
   const stopRecording = useCallback(() => {
     if (recognitionRef.current) {
       recognitionRef.current.stop();
       setActiveRecordingId(null);
+      stopAudioVisualizer();
     }
   }, []);
 
@@ -279,20 +369,52 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
                     {!hasSpeechSupport && (
                       <textarea
                         value={transcripts[question.id] || ''}
+                        onFocus={() => { if (!startTimeRef.current) startTimeRef.current = Date.now(); }}
                         onChange={(e) => handleManualInput(question.id, question.modelAnswer, e.target.value)}
                         placeholder="Speech API not supported in this browser. Type your response here..."
                         style={{ width: '100%', minHeight: '80px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', padding: '0.75rem', borderRadius: '4px', fontSize: '0.8125rem', marginTop: '0.5rem' }}
                       />
                     )}
 
-                    {hasSpeechSupport && transcripts[question.id] !== undefined && (
-                      <div style={{ fontSize: '0.8125rem', color: '#94A3B8', fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '4px' }}>
+                    {activeRecordingId === question.id && hasSpeechSupport && (
+                      <canvas 
+                        ref={canvasRef} 
+                        width={400} 
+                        height={40} 
+                        style={{ width: '100%', height: '40px', background: 'rgba(0,0,0,0.2)', borderRadius: '4px', marginTop: '0.5rem' }}
+                      />
+                    )}
+
+                    {transcripts[question.id] !== undefined && (
+                      <div style={{ fontSize: '0.8125rem', color: '#94A3B8', fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '4px', marginTop: '0.5rem' }}>
                         "{transcripts[question.id]}"
                       </div>
                     )}
                     {scores[question.id] !== undefined && (
-                      <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: scores[question.id] > 50 ? '#00F5A0' : '#F59E0B' }}>
-                        Keyword Match Score: {scores[question.id]}%
+                      <div style={{ marginTop: '0.75rem', background: 'rgba(255, 255, 255, 0.04)', padding: '0.75rem', borderRadius: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                          <span style={{ fontSize: '0.75rem', color: '#CBD5E1', fontWeight: 600 }}>Conceptual Relevance Score</span>
+                          <span style={{ fontSize: '0.75rem', color: scores[question.id] > 70 ? '#00F5A0' : scores[question.id] > 40 ? '#00D9F5' : '#F59E0B', fontWeight: 700 }}>
+                            {scores[question.id]}%
+                          </span>
+                        </div>
+                        {latency[question.id] !== undefined && (
+                          <div style={{ fontSize: '0.6875rem', color: '#94A3B8', marginBottom: '0.5rem' }}>
+                            Defense Latency: {latency[question.id]}s elapsed before response
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem' }}>
+                          {keywordBadges[question.id]?.matched.map(kw => (
+                            <span key={kw} style={{ background: 'rgba(0, 245, 160, 0.1)', color: '#00F5A0', border: '1px solid rgba(0, 245, 160, 0.2)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.625rem' }}>
+                              ✓ {kw}
+                            </span>
+                          ))}
+                          {keywordBadges[question.id]?.missing.map(kw => (
+                            <span key={kw} style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B', border: '1px solid rgba(245, 158, 11, 0.2)', padding: '2px 6px', borderRadius: '4px', fontSize: '0.625rem' }}>
+                              ! {kw}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

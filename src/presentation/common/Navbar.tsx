@@ -35,6 +35,8 @@ interface NavbarProps {
   readonly isAudioEnabled: boolean;
   readonly onToggleAudio: () => void;
   readonly onLoadDemo: () => void;
+  readonly onExportProject: () => void;
+  readonly onImportProject: (e: React.ChangeEvent<HTMLInputElement>) => void;
   readonly readinessScore: number;
 }
 
@@ -62,7 +64,7 @@ function mapEngineStatusToBadge(status: EngineStatus): 'online' | 'offline' | 'w
  * @param props - Component configuration
  * @returns The rendered navigation bar
  */
-export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, onToggleAudio, onLoadDemo, readinessScore }: NavbarProps): React.JSX.Element {
+export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, onToggleAudio, onLoadDemo, onExportProject, onImportProject, readinessScore }: NavbarProps): React.JSX.Element {
   const handleTabClick = useCallback(
     (tab: ActiveTab) => {
       onTabChange(tab);
@@ -169,7 +171,21 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
       </div>
 
       {/* Right controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <button
+          onClick={onExportProject}
+          style={{ background: 'transparent', border: '1px solid rgba(0, 245, 160, 0.3)', color: '#00F5A0', borderRadius: '4px', padding: '0.375rem 0.75rem', fontSize: '0.6875rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease' }}
+          title="Export Project (.json)"
+        >
+          ⬇️ Export
+        </button>
+        <label
+          style={{ background: 'transparent', border: '1px solid rgba(0, 217, 245, 0.3)', color: '#00D9F5', borderRadius: '4px', padding: '0.375rem 0.75rem', fontSize: '0.6875rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center' }}
+          title="Import Project (.json)"
+        >
+          ⬆️ Import
+          <input type="file" accept=".json" onChange={onImportProject} style={{ display: 'none' }} />
+        </label>
         <button
           onClick={onLoadDemo}
           style={{
