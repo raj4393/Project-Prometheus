@@ -22,6 +22,7 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
   const [activeProficiency, setActiveProficiency] = useState<SkillTag | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [customSkills, setCustomSkills] = useState<string[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>('All');
 
   const isSelected = useCallback(
     (tag: SkillTag): boolean => selectedSkills.some((s) => s.tag === tag),
@@ -86,13 +87,19 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
   const needsBackendForAI = hasAI && !hasBackend;
 
   const filteredGroups = useMemo(() => {
-    if (!searchQuery) return SKILL_GROUPS;
+    let groups = SKILL_GROUPS;
+    if (activeCategory !== 'All') {
+      groups = groups.filter(g => g.category === activeCategory);
+    }
+    
+    if (!searchQuery) return groups;
+    
     const lowerQuery = searchQuery.toLowerCase();
-    return SKILL_GROUPS.map(g => ({
+    return groups.map(g => ({
       ...g,
       skills: g.skills.filter(s => s.toLowerCase().includes(lowerQuery))
     })).filter(g => g.skills.length > 0);
-  }, [searchQuery]);
+  }, [searchQuery, activeCategory]);
 
   const exactMatchExists = useMemo(() => {
     const lowerQuery = searchQuery.toLowerCase();
@@ -101,8 +108,11 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
 
   return (
     <SurfaceCard ariaLabel="Skill matrix input" as="section">
-      <h3 style={{ color: '#F0F4F8', fontSize: '1.125rem', fontWeight: 700, marginTop: 0, marginBottom: '1rem' }}>
-        🧬 Skill Matrix
+      <h3 style={{ color: '#F0F4F8', fontSize: '1.125rem', fontWeight: 700, marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>🧬 Skill Taxonomy Matrix</span>
+        <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94a3b8', background: 'rgba(255,255,255,0.06)', padding: '2px 8px', borderRadius: '12px' }}>
+          Selected: {selectedSkills.length}
+        </span>
       </h3>
 
       <div style={{ marginBottom: '1rem' }}>
@@ -111,9 +121,40 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !exactMatchExists && handleAddCustomSkill()}
-          placeholder="Search skills or type custom skill and press Enter..." 
-          style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', borderRadius: '8px' }}
+          placeholder="Search 50+ technologies or type custom..." 
+          style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', borderRadius: '8px', transition: 'all 0.2s', outline: 'none' }}
+          onFocus={(e) => { e.currentTarget.style.borderColor = '#06b6d4'; }}
+          onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
         />
+        
+        {/* Category Filters */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+          <button
+            onClick={() => setActiveCategory('All')}
+            style={{
+              padding: '4px 12px', borderRadius: '9999px', fontSize: '11px', fontWeight: 500, cursor: 'pointer', border: 'none', transition: 'all 0.2s', whiteSpace: 'nowrap',
+              background: activeCategory === 'All' ? 'rgba(6, 182, 212, 0.15)' : 'rgba(255,255,255,0.03)',
+              color: activeCategory === 'All' ? '#22d3ee' : '#94a3b8',
+              boxShadow: activeCategory === 'All' ? 'inset 0 0 0 1px rgba(6,182,212,0.3)' : 'inset 0 0 0 1px rgba(255,255,255,0.08)'
+            }}
+          >
+            All
+          </button>
+          {SKILL_GROUPS.map(g => (
+            <button
+              key={g.category}
+              onClick={() => setActiveCategory(g.category)}
+              style={{
+                padding: '4px 12px', borderRadius: '9999px', fontSize: '11px', fontWeight: 500, cursor: 'pointer', border: 'none', transition: 'all 0.2s', whiteSpace: 'nowrap',
+                background: activeCategory === g.category ? 'rgba(6, 182, 212, 0.15)' : 'rgba(255,255,255,0.03)',
+                color: activeCategory === g.category ? '#22d3ee' : '#94a3b8',
+                boxShadow: activeCategory === g.category ? 'inset 0 0 0 1px rgba(6,182,212,0.3)' : 'inset 0 0 0 1px rgba(255,255,255,0.08)'
+              }}
+            >
+              {g.category.replace(' & Microservices', '').replace(', LLMs & Data Science', '/ML').replace(' & Hardware', '').replace(' & Queues', '')}
+            </button>
+          ))}
+        </div>
         {searchQuery && !exactMatchExists && (
           <button 
             onClick={handleAddCustomSkill}
@@ -137,13 +178,25 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
                     <button
                       onClick={() => handleSkillToggle(skill)}
                       style={{
-                        background: isSelected(skill) ? `${profColor}20` : 'rgba(255,255,255,0.05)',
-                        border: isSelected(skill) ? `1px solid ${profColor}` : '1px solid rgba(255,255,255,0.1)',
+                        background: isSelected(skill) ? `${profColor}20` : 'rgba(255,255,255,0.03)',
+                        border: isSelected(skill) ? `1px solid ${profColor}` : '1px solid rgba(255,255,255,0.08)',
                         color: isSelected(skill) ? profColor : '#CBD5E1',
                         padding: '0.375rem 0.75rem',
                         borderRadius: '20px',
                         cursor: 'pointer',
-                        fontSize: '0.8125rem'
+                        fontSize: '0.8125rem',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: activeProficiency === skill ? 'scale(0.97)' : 'scale(1)',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeProficiency !== skill) {
+                          e.currentTarget.style.transform = 'scale(1.02)';
+                          e.currentTarget.style.boxShadow = isSelected(skill) ? `0 0 8px ${profColor}40` : '0 0 8px rgba(255,255,255,0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = activeProficiency === skill ? 'scale(0.97)' : 'scale(1)';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       {skill} {prof && <span style={{ fontSize: '0.625rem', marginLeft: '4px' }}>({prof})</span>}
@@ -178,13 +231,25 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
                     <button
                       onClick={() => handleSkillToggle(skill)}
                       style={{
-                        background: isSelected(skill) ? `${profColor}20` : 'rgba(255,255,255,0.05)',
-                        border: isSelected(skill) ? `1px solid ${profColor}` : '1px solid rgba(255,255,255,0.1)',
+                        background: isSelected(skill) ? `${profColor}20` : 'rgba(255,255,255,0.03)',
+                        border: isSelected(skill) ? `1px solid ${profColor}` : '1px solid rgba(255,255,255,0.08)',
                         color: isSelected(skill) ? profColor : '#CBD5E1',
                         padding: '0.375rem 0.75rem',
                         borderRadius: '20px',
                         cursor: 'pointer',
-                        fontSize: '0.8125rem'
+                        fontSize: '0.8125rem',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        transform: activeProficiency === skill ? 'scale(0.97)' : 'scale(1)',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (activeProficiency !== skill) {
+                          e.currentTarget.style.transform = 'scale(1.02)';
+                          e.currentTarget.style.boxShadow = isSelected(skill) ? `0 0 8px ${profColor}40` : '0 0 8px rgba(255,255,255,0.1)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = activeProficiency === skill ? 'scale(0.97)' : 'scale(1)';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       {skill} {prof && <span style={{ fontSize: '0.625rem', marginLeft: '4px' }}>({prof})</span>}

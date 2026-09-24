@@ -383,31 +383,42 @@ export default function App(): React.JSX.Element {
                   <h3 style={{ color: '#f3f4f6', fontSize: '0.875rem', fontWeight: 600, marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ color: '#06b6d4' }}>⚡</span> Stack Health
                   </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.75rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#94a3b8' }}>Language Base</span>
-                      <span style={{ color: skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                        {skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? 'Covered' : 'Missing'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#94a3b8' }}>Backend Services</span>
-                      <span style={{ color: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                        {skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Covered' : 'Missing'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#94a3b8' }}>Database Layer</span>
-                      <span style={{ color: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                        {skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? 'Covered' : 'Missing'}
-                      </span>
-                    </div>
-                    
-                    {skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) && !skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) && (
-                      <div style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '4px', color: '#F59E0B' }}>
-                        ⚠️ AI detected without backend. Add FastAPI or Python API.
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#94a3b8' }}>Language & Framework Binding</span>
+                        <span style={{ color: skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
+                          {skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? 'Active' : 'Missing'}
+                        </span>
                       </div>
-                    )}
+                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#94a3b8' }}>Data Layer Integrity</span>
+                        <span style={{ color: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
+                          {skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? 'Configured' : 'Missing'}
+                        </span>
+                      </div>
+                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#94a3b8' }}>AI / LLM Pipeline</span>
+                        <span style={{ color: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#F59E0B') : '#64748b' }}>
+                          {skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Ready' : 'Missing Backend') : 'Inactive'}
+                        </span>
+                      </div>
+                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '50%') : '10%', background: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#F59E0B') : '#64748b', transition: 'all 0.3s ease' }} />
+                      </div>
+                    </div>
                   </div>
                 </SurfaceCard>
                 

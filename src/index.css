@@ -10,8 +10,8 @@
 :root {
   /* Backgrounds */
   --bg-deep-space: #090a0f;
-  --bg-card: #11131a;
-  --bg-card-hover: #161922;
+  --bg-card: #0f1117;
+  --bg-card-hover: #131620;
 
   /* Borders */
   --border-subtle: #1e2230;
@@ -82,9 +82,14 @@ body {
   overflow-x: hidden;
 }
 
-/* Removed glowing grid background pattern to reduce visual noise */
+/* Radial gradient background accent */
 body::before {
-  display: none;
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(6, 182, 212, 0.08), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 #root {
@@ -175,8 +180,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .surface-card:hover {
   background: var(--bg-card-hover);
-  border-color: var(--border-hover);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-color: rgba(6, 182, 212, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
 .telemetry-footer {
