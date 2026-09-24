@@ -114,12 +114,25 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
           borderRadius: '9999px',
           border: '1px solid rgba(6, 182, 212, 0.3)'
         }}>
-          STUDIO ED.
+          CAPSTONE OS v1.0
         </span>
       </div>
 
       {/* Center: Pipeline Stepper */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="tablist">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }} role="tablist">
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
+          width: '120px',
+          background: 'rgba(255,255,255,0.06)',
+          borderRadius: '9999px',
+          zIndex: 0,
+          transition: 'transform 400ms cubic-bezier(0.16, 1, 0.3, 1), width 400ms cubic-bezier(0.16, 1, 0.3, 1)',
+          transform: `translateX(${NAV_TABS.findIndex(t => t.id === activeTab) * (120 + 8)}px)`,
+        }} />
+        
         {NAV_TABS.map((tab, index) => {
           const isActive = activeTab === tab.id;
           const isPassed = NAV_TABS.findIndex(t => t.id === activeTab) > index;
@@ -133,15 +146,19 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.375rem',
-                  padding: isActive ? '0.375rem 0.75rem' : '0.375rem 0.5rem',
+                  padding: '0.375rem 0.5rem',
+                  width: '120px',
+                  justifyContent: 'center',
                   borderRadius: '9999px',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: '0.75rem',
                   fontWeight: isActive ? 500 : 400,
                   color: isActive ? '#ffffff' : isPassed ? '#94a3b8' : '#64748b',
-                  background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                  background: 'transparent',
                   transition: 'all 0.2s ease',
+                  position: 'relative',
+                  zIndex: 1,
                 }}
               >
                 {isActive && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#06b6d4' }} />}
@@ -165,9 +182,9 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
         {/* Readiness Ring */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: '#f7f8f8', fontSize: '0.75rem' }}>
           <div style={{ position: 'relative', width: '20px', height: '20px' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }} className={readinessScore > 0 && readinessScore % 25 === 0 ? 'readiness-ring-glow' : ''}>
               <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
-              <circle cx="12" cy="12" r="10" fill="none" stroke={readinessScore >= 80 ? '#10b981' : readinessScore >= 50 ? '#06b6d4' : '#F59E0B'} strokeWidth="3" strokeDasharray="62.8" strokeDashoffset={62.8 - (62.8 * readinessScore) / 100} style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
+              <circle cx="12" cy="12" r="10" fill="none" stroke={readinessScore >= 80 ? '#10b981' : readinessScore >= 50 ? '#06b6d4' : '#F59E0B'} strokeWidth="3" strokeDasharray="62.8" strokeDashoffset={62.8 - (62.8 * readinessScore) / 100} style={{ transition: 'stroke-dashoffset 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
             </svg>
           </div>
           <span style={{ fontFamily: 'monospace' }}>{readinessScore}%</span>
@@ -176,14 +193,14 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
         <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }} />
 
         {/* Ghost Buttons */}
-        <label style={{ color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Import JSON">
+        <label className="btn-action" style={{ color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Import JSON">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
           <input type="file" accept=".json" onChange={onImportProject} style={{ display: 'none' }} />
         </label>
-        <button onClick={onExportProject} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Export JSON">
+        <button className="btn-action" onClick={onExportProject} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Export JSON">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         </button>
-        <button onClick={onLoadDemo} style={{ background: 'transparent', border: 'none', color: '#06b6d4', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Load Demo">
+        <button className="btn-action" onClick={onLoadDemo} style={{ background: 'transparent', border: 'none', color: '#06b6d4', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Load Demo">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
         </button>
         

@@ -203,11 +203,25 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
                     </button>
                     {activeProficiency === skill && (
                       <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: '0.25rem', background: '#0B1220', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', zIndex: 10, padding: '4px', minWidth: '150px' }}>
-                        {[ProficiencyLevel.Beginner, ProficiencyLevel.Intermediate, ProficiencyLevel.Advanced].map((level) => (
-                          <button key={level} onClick={() => handleProficiencySelect(skill, level)} style={{ display: 'block', width: '100%', background: 'none', border: 'none', color: '#FFF', textAlign: 'left', padding: '6px', fontSize: '0.75rem', cursor: 'pointer' }}>
-                            {level} ({level === ProficiencyLevel.Beginner ? '1x' : level === ProficiencyLevel.Intermediate ? '2x' : '3x'})
-                          </button>
-                        ))}
+                        {[ProficiencyLevel.Beginner, ProficiencyLevel.Intermediate, ProficiencyLevel.Advanced].map((level) => {
+                          const lvlLabel = level === ProficiencyLevel.Beginner ? '1x Novice' : level === ProficiencyLevel.Intermediate ? '2x Core' : '3x Lead';
+                          const lvlColor = level === ProficiencyLevel.Beginner ? '#94a3b8' : level === ProficiencyLevel.Intermediate ? '#06b6d4' : '#10b981';
+                          return (
+                            <button 
+                              key={level} 
+                              onClick={(e) => { e.stopPropagation(); handleProficiencySelect(skill, level); }} 
+                              style={{ 
+                                display: 'block', width: '100%', background: 'transparent', border: '1px solid transparent', 
+                                color: lvlColor, textAlign: 'left', padding: '6px 8px', fontSize: '0.75rem', cursor: 'pointer',
+                                borderRadius: '4px', transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.borderColor = `${lvlColor}50`; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                            >
+                              {lvlLabel}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>

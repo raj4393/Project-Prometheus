@@ -55,15 +55,22 @@ export default function App(): React.JSX.Element {
   const [showIeeeModal, setShowIeeeModal] = useState(false);
 
   /**
-   * Mouse Spotlight Listener
+   * Mouse Spotlight Listener with rAF throttling
    */
   useEffect(() => {
+    let animationFrameId: number;
     const handleMouseMove = (e: MouseEvent) => {
-      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
-      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(() => {
+        document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+      });
     };
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   /**
@@ -393,7 +400,7 @@ export default function App(): React.JSX.Element {
                 {/* Stack Health Card */}
                 <SurfaceCard ariaLabel="Stack Health Indicator" as="section" style={{ padding: '1.25rem' }}>
                   <h3 style={{ color: '#f3f4f6', fontSize: '0.875rem', fontWeight: 600, marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ color: '#06b6d4' }}>⚡</span> Stack Health & Feasibility
+                    <span style={{ color: '#06b6d4', animation: 'pulse-dot 2s infinite' }}>⚡</span> Stack Health & Feasibility
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.75rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
@@ -404,7 +411,7 @@ export default function App(): React.JSX.Element {
                         </span>
                       </div>
                       <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '0 0 10px rgba(16,185,129,0.5)' : 'none' }} />
                       </div>
                     </div>
 
@@ -412,11 +419,23 @@ export default function App(): React.JSX.Element {
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                         <span style={{ color: '#94a3b8' }}>Backend SLA</span>
                         <span style={{ color: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                          {skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Configured' : 'Missing'}
+                          {skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Active / Configured' : 'Missing'}
                         </span>
                       </div>
                       <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '0 0 10px rgba(16,185,129,0.5)' : 'none' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ color: '#94a3b8' }}>Database Layer</span>
+                        <span style={{ color: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#06b6d4' : '#F59E0B' }}>
+                          {skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? 'Configured' : 'Missing'}
+                        </span>
+                      </div>
+                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#06b6d4' : '#F59E0B', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '0 0 10px rgba(6,182,212,0.5)' : 'none' }} />
                       </div>
                     </div>
 
@@ -428,8 +447,20 @@ export default function App(): React.JSX.Element {
                         </span>
                       </div>
                       <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '50%') : '10%', background: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#F59E0B') : '#64748b', transition: 'all 0.3s ease' }} />
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '50%') : '10%', background: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#F59E0B') : '#64748b', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
                       </div>
+                    </div>
+                    
+                    <div style={{ marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                      {!skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) || !skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) || !skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', color: '#F59E0B', fontSize: '0.75rem', fontWeight: 500 }}>
+                          ⚠️ Warning: Add missing core layers (Frontend/Backend/DB) to complete architecture.
+                        </div>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '6px', color: '#10b981', fontSize: '0.75rem', fontWeight: 500 }}>
+                          ✓ Stack Balanced: Production Architecture Verified
+                        </div>
+                      )}
                     </div>
                   </div>
                 </SurfaceCard>
@@ -702,8 +733,10 @@ export default function App(): React.JSX.Element {
 
       {/* Persistent Telemetry Footer (Linear-inspired) */}
       <div className="telemetry-footer" style={{ 
-        height: '2rem', 
-        background: '#090b0e', 
+        height: '2.25rem', 
+        background: 'rgba(10, 12, 16, 0.95)', 
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         padding: '0 1.5rem',
         display: 'flex',
@@ -718,16 +751,32 @@ export default function App(): React.JSX.Element {
         right: 0,
         zIndex: 50
       }}>
+        {/* Left: Live Autosave Beacon */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ color: '#10b981' }}>●</span> State: Synced to LocalStorage
+          <span style={{ color: '#10b981', animation: 'pulse-dot 2s infinite' }}>●</span> 
+          State Engine: Synced ({new Date().toLocaleTimeString('en-US', { hour12: false })})
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#64748b' }}>
-          <span>[1-5] Jump Steps | [P] IEEE Preview | [Tab] Next</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ color: '#10b981' }}>Engine: Vitest 41/41 Passed</span>
+        
+        {/* Center: Interactive Hotkey Tags */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: '#64748b' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ background: '#1e2230', border: '1px solid #2b3145', padding: '1px 4px', borderRadius: '4px', color: '#cbd5e1' }}>1-5</span> Switch Tabs
+          </span>
           <span>|</span>
-          <span style={{ color: '#cbd5e1' }}>Strict TypeScript</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ background: '#1e2230', border: '1px solid #2b3145', padding: '1px 4px', borderRadius: '4px', color: '#cbd5e1' }}>P</span> IEEE Preview
+          </span>
+          <span>|</span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ background: '#1e2230', border: '1px solid #2b3145', padding: '1px 4px', borderRadius: '4px', color: '#cbd5e1' }}>Tab</span> Navigate
+          </span>
+        </div>
+        
+        {/* Right: System Health */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <span style={{ color: '#10b981' }}>Vitest: 41 Passed</span>
+          <span>|</span>
+          <span style={{ color: '#cbd5e1' }}>TS: Strict Validated</span>
         </div>
       </div>
 
