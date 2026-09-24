@@ -13,12 +13,12 @@ import { MetricsBadge } from '../design-system/MetricsBadge';
 /**
  * Navigation tab configuration.
  */
-const NAV_TABS: ReadonlyArray<{ id: ActiveTab; label: string; icon: string }> = [
-  { id: 'intake', label: 'Synopsis & Lit', icon: '📝' },
-  { id: 'blueprint', label: 'Architecture', icon: '🏗️' },
-  { id: 'roadmap', label: 'Roadmap & Sprints', icon: '🗺️' },
-  { id: 'defense', label: 'Viva Voce', icon: '🎤' },
-  { id: 'assessment', label: 'Faculty Audit', icon: '📋' },
+const NAV_TABS: ReadonlyArray<{ id: ActiveTab; label: string }> = [
+  { id: 'intake', label: 'Synopsis & Scope' },
+  { id: 'blueprint', label: 'System Topology' },
+  { id: 'roadmap', label: 'Sprints' },
+  { id: 'defense', label: 'Viva Voce' },
+  { id: 'assessment', label: 'Faculty Review' },
 ];
 
 /**
@@ -79,43 +79,47 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        height: '3.5rem', /* h-14 */
-        padding: '0 1.5rem', /* px-6 */
-        background: '#090a0f',
-        borderBottom: '1px solid #1e2230',
+        height: '3.5rem',
+        padding: '0 1.5rem',
+        background: 'rgba(8, 9, 10, 0.9)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         position: 'sticky',
         top: 0,
-        zIndex: 100,
+        zIndex: 50,
         fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
       }}
     >
-      {/* Left: Minimalist logo & Badge */}
+      {/* Left: Brand */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <span style={{ fontSize: '1rem', color: '#f3f4f6' }} aria-hidden="true">◆</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ filter: 'drop-shadow(0 0 4px rgba(6,182,212,0.6))' }}>
+          <path d="M12 2c-3.3 0-6 2.7-6 6 0 2.2 1.2 4.1 3 5.1V22h6v-8.9c1.8-1 3-2.9 3-5.1 0-3.3-2.7-6-6-6z"/>
+          <path d="M12 10v4"/>
+        </svg>
         <h1 style={{
-          fontSize: '0.875rem', /* text-sm */
+          fontSize: '0.875rem',
           fontWeight: 600,
           margin: 0,
-          color: '#f3f4f6',
-          letterSpacing: '0.05em', /* tracking-wider */
+          color: '#ffffff',
+          letterSpacing: '0.05em',
         }}>
           PROMETHEUS
         </h1>
         <span style={{ 
-          color: '#94a3b8', 
-          fontSize: '0.625rem', 
-          fontWeight: 500, 
-          padding: '0.125rem 0.375rem', 
-          borderRadius: '4px',
-          background: '#11131a',
-          border: '1px solid #1e2230'
+          background: 'rgba(6, 182, 212, 0.1)',
+          color: '#22d3ee',
+          fontSize: '10px',
+          padding: '2px 8px',
+          borderRadius: '9999px',
+          border: '1px solid rgba(6, 182, 212, 0.2)'
         }}>
-          v1.0 Capstone OS
+          CAPSTONE OS
         </span>
       </div>
 
-      {/* Center: Segmented Progress Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }} role="tablist">
+      {/* Center: Pipeline Stepper */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} role="tablist">
         {NAV_TABS.map((tab, index) => {
           const isActive = activeTab === tab.id;
           const isPassed = NAV_TABS.findIndex(t => t.id === activeTab) > index;
@@ -129,84 +133,74 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.375rem',
-                  padding: '0.375rem 0.75rem',
-                  borderRadius: '6px',
+                  padding: isActive ? '0.375rem 0.75rem' : '0.375rem 0.5rem',
+                  borderRadius: '9999px',
                   border: 'none',
                   cursor: 'pointer',
                   fontSize: '0.75rem',
                   fontWeight: isActive ? 500 : 400,
-                  color: isActive ? '#06b6d4' : isPassed ? '#94a3b8' : '#64748b',
-                  background: isActive ? 'rgba(6, 182, 212, 0.1)' : 'transparent',
+                  color: isActive ? '#ffffff' : isPassed ? '#94a3b8' : '#64748b',
+                  background: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
                   transition: 'all 0.2s ease',
-                  borderBottom: isActive ? '2px solid #06b6d4' : '2px solid transparent',
-                  borderBottomLeftRadius: isActive ? '0' : '6px',
-                  borderBottomRightRadius: isActive ? '0' : '6px',
                 }}
               >
-                <span style={{ color: isPassed ? '#10b981' : 'inherit' }}>
-                  {isPassed ? '✓' : `${index + 1}.`}
-                </span>
-                <span className="hide-on-mobile">{tab.label}</span>
+                {isActive && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#06b6d4' }} />}
+                {isPassed && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                {!isActive && !isPassed && <span style={{ opacity: 0.5 }}>0{index + 1}</span>}
+                <span className="hide-on-mobile">{isActive ? `0${index + 1} ${tab.label}` : tab.label}</span>
               </button>
               {index < NAV_TABS.length - 1 && (
-                <span style={{ color: '#1e2230', fontSize: '0.75rem' }}>›</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5l7 7-7 7"></path>
+                </svg>
               )}
             </React.Fragment>
           );
         })}
       </div>
 
-      {/* Right: Action Group */}
+      {/* Right: Controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        {/* Readiness Badge */}
-        <div style={{ 
-          display: 'flex', alignItems: 'center', gap: '0.375rem', 
-          background: '#11131a', border: '1px solid #1e2230', 
-          padding: '0.25rem 0.5rem', borderRadius: '9999px',
-          fontSize: '0.75rem', color: '#f3f4f6'
-        }}>
-          <div style={{ 
-            width: '8px', height: '8px', borderRadius: '50%', 
-            background: readinessScore >= 80 ? '#10b981' : readinessScore >= 50 ? '#06b6d4' : '#F59E0B' 
-          }} />
-          <span>Readiness: {readinessScore}%</span>
+        {/* Readiness Ring */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', color: '#f7f8f8', fontSize: '0.75rem' }}>
+          <div style={{ position: 'relative', width: '20px', height: '20px' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" style={{ transform: 'rotate(-90deg)' }}>
+              <circle cx="12" cy="12" r="10" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
+              <circle cx="12" cy="12" r="10" fill="none" stroke={readinessScore >= 80 ? '#10b981' : readinessScore >= 50 ? '#06b6d4' : '#F59E0B'} strokeWidth="3" strokeDasharray="62.8" strokeDashoffset={62.8 - (62.8 * readinessScore) / 100} style={{ transition: 'stroke-dashoffset 0.5s ease' }} />
+            </svg>
+          </div>
+          <span style={{ fontFamily: 'monospace' }}>{readinessScore}%</span>
         </div>
 
+        <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }} />
+
         {/* Ghost Buttons */}
-        <label style={{ color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '4px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }}>
-          Import
+        <label style={{ color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Import JSON">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
           <input type="file" accept=".json" onChange={onImportProject} style={{ display: 'none' }} />
         </label>
-        <button onClick={onExportProject} style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '0.75rem', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '4px', transition: 'all 0.2s' }}>
-          Export JSON
+        <button onClick={onExportProject} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Export JSON">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
         </button>
-        <button onClick={onLoadDemo} style={{ background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.3)', color: '#06b6d4', fontSize: '0.75rem', fontWeight: 500, cursor: 'pointer', padding: '0.25rem 0.75rem', borderRadius: '4px', transition: 'all 0.2s' }}>
-          Load Demo
+        <button onClick={onLoadDemo} style={{ background: 'transparent', border: 'none', color: '#06b6d4', cursor: 'pointer', padding: '0.25rem', borderRadius: '6px', transition: 'all 0.2s', display: 'flex', alignItems: 'center' }} title="Load Demo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
         </button>
         
-        {/* Helper Badge */}
-        <kbd style={{ background: '#11131a', border: '1px solid #1e2230', padding: '2px 6px', borderRadius: '4px', fontSize: '0.625rem', color: '#64748b' }}>
+        <div style={{ width: '1px', height: '16px', background: 'rgba(255,255,255,0.1)' }} />
+
+        {/* Hotkey Tag */}
+        <kbd style={{ 
+          background: 'rgba(255,255,255,0.06)', 
+          border: '1px solid rgba(255,255,255,0.12)', 
+          padding: '2px 6px', 
+          borderRadius: '4px', 
+          fontSize: '10px', 
+          fontFamily: 'monospace', 
+          color: '#cbd5e1' 
+        }}>
           P Preview
         </kbd>
-
-        <button
-          onClick={onToggleAudio}
-          aria-label={isAudioEnabled ? "Mute sounds" : "Unmute sounds"}
-          title={isAudioEnabled ? "Mute sounds" : "Unmute sounds"}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: isAudioEnabled ? '#94a3b8' : '#64748b',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            padding: '0.25rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {isAudioEnabled ? '🔊' : '🔇'}
-        </button>
       </div>
     </nav>
   );
