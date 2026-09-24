@@ -9,9 +9,9 @@
 /* ---- CSS Custom Properties (Design Tokens) ---- */
 :root {
   /* Backgrounds */
-  --bg-deep-space: #090a0f;
-  --bg-card: #0f1117;
-  --bg-card-hover: #131620;
+  --bg-deep-space: #07080a;
+  --bg-card: #0e1015;
+  --bg-card-hover: #12161f;
 
   /* Borders */
   --border-subtle: #1e2230;
@@ -87,7 +87,7 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(6, 182, 212, 0.08), transparent 70%);
+  background-image: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.12), transparent 60%);
   pointer-events: none;
   z-index: 0;
 }
@@ -180,8 +180,8 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .surface-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(6, 182, 212, 0.3);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgba(34, 211, 238, 0.4);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
 }
 
 .telemetry-footer {

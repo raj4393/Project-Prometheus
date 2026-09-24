@@ -14,11 +14,11 @@ import { MetricsBadge } from '../design-system/MetricsBadge';
  * Navigation tab configuration.
  */
 const NAV_TABS: ReadonlyArray<{ id: ActiveTab; label: string }> = [
-  { id: 'intake', label: 'Synopsis & Scope' },
-  { id: 'blueprint', label: 'System Topology' },
-  { id: 'roadmap', label: 'Sprints' },
-  { id: 'defense', label: 'Viva Voce' },
-  { id: 'assessment', label: 'Faculty Review' },
+  { id: 'intake', label: 'Scope' },
+  { id: 'blueprint', label: 'Topology' },
+  { id: 'roadmap', label: 'Roadmap' },
+  { id: 'defense', label: 'Viva' },
+  { id: 'assessment', label: 'Review' },
 ];
 
 /**
@@ -81,7 +81,7 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
         justifyContent: 'space-between',
         height: '3.5rem',
         padding: '0 1.5rem',
-        background: 'rgba(8, 9, 10, 0.9)',
+        background: 'rgba(7, 8, 10, 0.9)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
@@ -112,9 +112,9 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
           fontSize: '10px',
           padding: '2px 8px',
           borderRadius: '9999px',
-          border: '1px solid rgba(6, 182, 212, 0.2)'
+          border: '1px solid rgba(6, 182, 212, 0.3)'
         }}>
-          CAPSTONE OS
+          STUDIO ED.
         </span>
       </div>
 

@@ -280,7 +280,7 @@ export default function App(): React.JSX.Element {
             </div>
 
             {/* Bento-Grid Layout */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.25rem', maxWidth: '80rem', margin: '0 auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.25rem', maxWidth: '80rem', margin: '0 auto', padding: '1.5rem' }}>
               {/* Left Grid (col-span-4) */}
               <div style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                 <SurfaceCard ariaLabel="Student information" as="section" style={{ padding: '1.25rem' }}>
@@ -370,7 +370,7 @@ export default function App(): React.JSX.Element {
                               transition: 'all 0.2s',
                             }}
                           >
-                            {al}
+                            {al === 'Practical' ? 'Minimalist' : al}
                           </button>
                         ))}
                       </div>
@@ -381,36 +381,36 @@ export default function App(): React.JSX.Element {
                 {/* Stack Health Card */}
                 <SurfaceCard ariaLabel="Stack Health Indicator" as="section" style={{ padding: '1.25rem' }}>
                   <h3 style={{ color: '#f3f4f6', fontSize: '0.875rem', fontWeight: 600, marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ color: '#06b6d4' }}>⚡</span> Stack Health
+                    <span style={{ color: '#06b6d4' }}>⚡</span> Stack Health & Feasibility
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.75rem' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#94a3b8' }}>Language & Framework Binding</span>
-                        <span style={{ color: skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                          {skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? 'Active' : 'Missing'}
+                        <span style={{ color: '#94a3b8' }}>Frontend Binding</span>
+                        <span style={{ color: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
+                          {skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '100% Configured' : 'Missing'}
                         </span>
                       </div>
                       <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[0].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#94a3b8' }}>Data Layer Integrity</span>
-                        <span style={{ color: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                          {skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? 'Configured' : 'Missing'}
+                        <span style={{ color: '#94a3b8' }}>Backend SLA</span>
+                        <span style={{ color: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
+                          {skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Configured' : 'Missing'}
                         </span>
                       </div>
                       <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
+                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.3s ease' }} />
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#94a3b8' }}>AI / LLM Pipeline</span>
+                        <span style={{ color: '#94a3b8' }}>AI/Data Engine</span>
                         <span style={{ color: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#F59E0B') : '#64748b' }}>
                           {skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Ready' : 'Missing Backend') : 'Inactive'}
                         </span>
@@ -690,9 +690,8 @@ export default function App(): React.JSX.Element {
 
       {/* Persistent Telemetry Footer (Linear-inspired) */}
       <div className="telemetry-footer" style={{ 
-        height: '2.25rem', 
-        background: 'rgba(10, 12, 16, 0.95)', 
-        backdropFilter: 'blur(4px)', 
+        height: '2rem', 
+        background: '#090b0e', 
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',
         padding: '0 1.5rem',
         display: 'flex',
@@ -708,17 +707,15 @@ export default function App(): React.JSX.Element {
         zIndex: 50
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ color: '#10b981' }}>●</span> Local State: Synced ({new Date().toISOString().split('T')[1].split('.')[0]}Z)
+          <span style={{ color: '#10b981' }}>●</span> State: Synced to LocalStorage
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#64748b' }}>
-          <span>Shortcuts: [1-5] Switch Tabs | [P] IEEE Preview | [Tab] Next Field</span>
+          <span>[1-5] Jump Steps | [P] IEEE Preview | [Tab] Next</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ color: '#10b981' }}>Vitest: 41 Passed</span>
+          <span style={{ color: '#10b981' }}>Engine: Vitest 41/41 Passed</span>
           <span>|</span>
-          <span style={{ color: '#cbd5e1' }}>TS: 0 Errors</span>
-          <span>|</span>
-          <span style={{ color: '#cbd5e1' }}>Production Ready</span>
+          <span style={{ color: '#cbd5e1' }}>Strict TypeScript</span>
         </div>
       </div>
 
