@@ -14,10 +14,11 @@ import { MetricsBadge } from '../design-system/MetricsBadge';
  * Navigation tab configuration.
  */
 const NAV_TABS: ReadonlyArray<{ id: ActiveTab; label: string; icon: string }> = [
-  { id: 'intake', label: 'Profile', icon: '🧑‍🎓' },
-  { id: 'blueprint', label: 'Blueprint', icon: '📐' },
-  { id: 'roadmap', label: 'Roadmap', icon: '🗺️' },
-  { id: 'defense', label: 'Defense', icon: '🎤' },
+  { id: 'intake', label: 'Synopsis & Lit', icon: '📝' },
+  { id: 'blueprint', label: 'Architecture', icon: '🏗️' },
+  { id: 'roadmap', label: 'Roadmap & Sprints', icon: '🗺️' },
+  { id: 'defense', label: 'Viva Voce', icon: '🎤' },
+  { id: 'assessment', label: 'Faculty Audit', icon: '📋' },
 ];
 
 /**
@@ -33,6 +34,8 @@ interface NavbarProps {
   readonly engineStatus: EngineStatus;
   readonly isAudioEnabled: boolean;
   readonly onToggleAudio: () => void;
+  readonly onLoadDemo: () => void;
+  readonly readinessScore: number;
 }
 
 /**
@@ -59,7 +62,7 @@ function mapEngineStatusToBadge(status: EngineStatus): 'online' | 'offline' | 'w
  * @param props - Component configuration
  * @returns The rendered navigation bar
  */
-export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, onToggleAudio }: NavbarProps): React.JSX.Element {
+export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, onToggleAudio, onLoadDemo, readinessScore }: NavbarProps): React.JSX.Element {
   const handleTabClick = useCallback(
     (tab: ActiveTab) => {
       onTabChange(tab);
@@ -107,41 +110,85 @@ export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, o
         </div>
       </div>
 
-      {/* Tab navigation */}
-      <div style={{ display: 'flex', gap: '0.25rem' }} role="tablist" aria-label="Application sections">
-        {NAV_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            aria-controls={`panel-${tab.id}`}
-            onClick={() => handleTabClick(tab.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.375rem',
-              padding: '0.5rem 1rem',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.8125rem',
-              fontWeight: activeTab === tab.id ? 700 : 500,
-              fontFamily: "'Inter', system-ui, sans-serif",
-              color: activeTab === tab.id ? '#00F5A0' : '#64748B',
-              background: activeTab === tab.id
-                ? 'rgba(0, 245, 160, 0.08)'
-                : 'transparent',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <span aria-hidden="true">{tab.icon}</span>
-            {tab.label}
-          </button>
-        ))}
+      {/* 5-Phase Stepper */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, justifyContent: 'center' }} role="tablist" aria-label="Application stepper">
+        {NAV_TABS.map((tab, index) => {
+          const isActive = activeTab === tab.id;
+          const isPassed = NAV_TABS.findIndex(t => t.id === activeTab) > index;
+          return (
+            <React.Fragment key={tab.id}>
+              <button
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`panel-${tab.id}`}
+                onClick={() => handleTabClick(tab.id)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.375rem',
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '20px',
+                  border: isActive ? '1px solid #00F5A0' : '1px solid transparent',
+                  cursor: 'pointer',
+                  fontSize: '0.75rem',
+                  fontWeight: isActive ? 700 : 500,
+                  color: isActive ? '#00F5A0' : isPassed ? '#00D9F5' : '#64748B',
+                  background: isActive ? 'rgba(0, 245, 160, 0.08)' : 'transparent',
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                <span style={{ 
+                  width: '20px', height: '20px', borderRadius: '50%', 
+                  background: isPassed ? '#00D9F5' : isActive ? '#00F5A0' : 'rgba(255,255,255,0.1)', 
+                  color: isPassed || isActive ? '#000' : '#FFF', 
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: 'bold' 
+                }}>
+                  {isPassed ? '✓' : index + 1}
+                </span>
+                <span className="hide-on-mobile">{tab.label}</span>
+              </button>
+              {index < NAV_TABS.length - 1 && (
+                <div style={{ width: '30px', height: '2px', background: isPassed ? '#00D9F5' : 'rgba(255,255,255,0.1)' }} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+
+      {/* Readiness Meter */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginRight: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <span style={{ fontSize: '0.625rem', color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Readiness</span>
+          <span style={{ fontSize: '0.875rem', fontWeight: 800, color: readinessScore >= 80 ? '#00F5A0' : readinessScore >= 50 ? '#00D9F5' : '#F59E0B' }}>
+            {readinessScore}%
+          </span>
+        </div>
+        <div style={{ width: '60px', height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '3px', overflow: 'hidden' }}>
+          <div style={{ width: `${readinessScore}%`, height: '100%', background: readinessScore >= 80 ? '#00F5A0' : readinessScore >= 50 ? '#00D9F5' : '#F59E0B', transition: 'width 0.5s ease' }} />
+        </div>
       </div>
 
       {/* Right controls */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <button
+          onClick={onLoadDemo}
+          style={{
+            background: 'rgba(139, 92, 246, 0.15)',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
+            color: '#8B5CF6',
+            borderRadius: '6px',
+            padding: '0.375rem 0.75rem',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🚀 Load Demo
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.625rem', color: '#00F5A0', background: 'rgba(0, 245, 160, 0.1)', padding: '0.25rem 0.5rem', borderRadius: '4px' }}>
+          <span aria-hidden="true">💾</span> Auto-saved
+        </div>
         <button
           onClick={onToggleAudio}
           aria-label={isAudioEnabled ? "Mute sounds" : "Unmute sounds"}

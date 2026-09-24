@@ -22,6 +22,8 @@ import { LiveStatusBar } from './presentation/common/LiveStatusBar';
 import { SkillMatrixInput } from './presentation/modules/intake/SkillMatrixInput';
 import { DomainSelector } from './presentation/modules/intake/DomainSelector';
 import { ArchitectureTopology } from './presentation/modules/synthesis/ArchitectureTopology';
+import { ArchitectureVisualizer } from './presentation/modules/synthesis/ArchitectureVisualizer';
+import { EvaluatorRadar } from './presentation/modules/synthesis/EvaluatorRadar';
 import { FeasibilityGauge } from './presentation/modules/synthesis/FeasibilityGauge';
 import { SprintChecklist } from './presentation/modules/roadmap/SprintChecklist';
 import { VivaSimulator } from './presentation/modules/defense/VivaSimulator';
@@ -29,6 +31,9 @@ import { SurfaceCard } from './presentation/design-system/SurfaceCard';
 import { CyberAction } from './presentation/design-system/CyberAction';
 import { ComparisonMatrix } from './presentation/modules/synthesis/ComparisonMatrix';
 import { IEEEPrintPreviewModal } from './presentation/common/IEEEPrintPreviewModal';
+import { LiteratureMatrix } from './presentation/modules/academic/LiteratureMatrix';
+import { AcademicRubric } from './presentation/modules/academic/AcademicRubric';
+import { FacultyGradingPanel } from './presentation/modules/assessment/FacultyGradingPanel';
 
 /**
  * Root application component rendering the Project Prometheus platform.
@@ -160,6 +165,44 @@ export default function App(): React.JSX.Element {
     dispatch({ type: 'TOGGLE_AUDIO' });
   }, [dispatch]);
 
+  const handleLoadDemo = useCallback(() => {
+    dispatch({ type: 'LOAD_DEMO' });
+    if (state.isAudioEnabled) playSuccess();
+  }, [dispatch, state.isAudioEnabled]);
+
+  // Calculate Readiness Score
+  let readinessScore = 0;
+  if (state.activeTab !== 'intake') {
+    let completedPhases = 1; // Passed intake/lit
+    if (state.blueprint) completedPhases++;
+    if (state.roadmap && state.roadmap.completedMilestones > 0) completedPhases++;
+    if (state.defense && state.defense.questions.some(q => q.isRevealed)) completedPhases++;
+    if (state.facultyAssessment && state.facultyAssessment.review0?.remarks) completedPhases++;
+    readinessScore = Math.min(100, Math.round((completedPhases / 5) * 100));
+  }
+
+  // Keyboard Shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeElement = document.activeElement as HTMLElement;
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA' || activeElement.isContentEditable)) {
+        return;
+      }
+      
+      switch(e.key.toLowerCase()) {
+        case '1': handleTabChange('intake'); break;
+        case '2': handleTabChange('blueprint'); break;
+        case '3': handleTabChange('roadmap'); break;
+        case '4': handleTabChange('defense'); break;
+        case '5': handleTabChange('assessment'); break;
+        case 'p': setShowIeeeModal((prev: boolean) => !prev); break;
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleTabChange]);
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#05070E' }}>
       <Navbar
@@ -168,6 +211,8 @@ export default function App(): React.JSX.Element {
         engineStatus={state.engineStatus}
         isAudioEnabled={state.isAudioEnabled}
         onToggleAudio={handleToggleAudio}
+        onLoadDemo={handleLoadDemo}
+        readinessScore={readinessScore}
       />
 
       <main
@@ -446,8 +491,10 @@ export default function App(): React.JSX.Element {
               </p>
             </SurfaceCard>
 
-            {/* Architecture */}
-            <div style={{ marginBottom: '1.25rem' }}>
+            {/* Radar, Rubric & Architecture */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 2fr', gap: '1.25rem', marginBottom: '1.25rem' }}>
+              <EvaluatorRadar blueprint={state.blueprint} defense={state.defense} />
+              <AcademicRubric blueprint={state.blueprint} roadmap={state.roadmap} defense={state.defense} />
               <ArchitectureTopology blueprint={state.blueprint} />
             </div>
 
@@ -513,6 +560,13 @@ export default function App(): React.JSX.Element {
           </div>
         )}
 
+        {/* ===== VISUALIZER TAB ===== */}
+        {state.activeTab === 'visualizer' && state.blueprint && (
+          <div id="panel-visualizer" role="tabpanel" aria-labelledby="tab-visualizer">
+            <ArchitectureVisualizer blueprint={state.blueprint} />
+          </div>
+        )}
+
         {/* ===== ROADMAP TAB ===== */}
         {state.activeTab === 'roadmap' && state.roadmap && (
           <div id="panel-roadmap" role="tabpanel" aria-labelledby="tab-roadmap">
@@ -527,8 +581,22 @@ export default function App(): React.JSX.Element {
           </div>
         )}
 
-        {/* Empty state for blueprint/roadmap/defense when not generated */}
-        {(state.activeTab === 'blueprint' || state.activeTab === 'roadmap' || state.activeTab === 'defense') &&
+        {/* ===== LITERATURE TAB ===== */}
+        {state.activeTab === 'literature' && (
+          <div id="panel-literature" role="tabpanel" aria-labelledby="tab-literature">
+            <LiteratureMatrix />
+          </div>
+        )}
+
+        {/* ===== ASSESSMENT TAB ===== */}
+        {state.activeTab === 'assessment' && (
+          <div id="panel-assessment" role="tabpanel" aria-labelledby="tab-assessment">
+            <FacultyGradingPanel />
+          </div>
+        )}
+
+        {/* Empty state for blueprint/roadmap/defense/visualizer when not generated */}
+        {(state.activeTab === 'blueprint' || state.activeTab === 'roadmap' || state.activeTab === 'defense' || state.activeTab === 'visualizer' || state.activeTab === 'assessment') &&
          !state.blueprint && (
           <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
             <span style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem' }} aria-hidden="true">🚀</span>

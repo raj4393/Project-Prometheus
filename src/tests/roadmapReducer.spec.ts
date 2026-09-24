@@ -61,6 +61,8 @@ function createBaseState(roadmap: RoadmapContract | null = null): AppState {
     isAudioEnabled: false,
     presetBlueprints: [],
     savedBlueprints: [],
+    literature: [],
+    facultyAssessment: null,
   };
 }
 

@@ -60,6 +60,20 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
   const [scores, setScores] = useState<Record<string, number>>({});
   const recognitionRef = useRef<any>(null);
 
+  const hasSpeechSupport = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+
+  const calculateScore = (answer: string, spoken: string) => {
+    const answerWords = answer.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+    const spokenWords = spoken.toLowerCase().split(/\s+/);
+    const matches = answerWords.filter(w => spokenWords.some(sw => sw.includes(w))).length;
+    return answerWords.length > 0 ? Math.min(100, Math.round((matches / answerWords.length) * 100)) : 0;
+  };
+
+  const handleManualInput = (questionId: string, modelAnswer: string, text: string) => {
+    setTranscripts(prev => ({ ...prev, [questionId]: text }));
+    setScores(prev => ({ ...prev, [questionId]: calculateScore(modelAnswer, text) }));
+  };
+
   const startRecording = useCallback((questionId: string, modelAnswer: string) => {
     if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
       alert('Speech recognition is not supported in this browser.');
@@ -82,11 +96,7 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
       }
       setTranscripts(prev => ({ ...prev, [questionId]: currentTranscript }));
       
-      // Simple keyword matching score
-      const answerWords = modelAnswer.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-      const spokenWords = currentTranscript.toLowerCase().split(/\s+/);
-      const matches = answerWords.filter(w => spokenWords.some(sw => sw.includes(w))).length;
-      const score = answerWords.length > 0 ? Math.min(100, Math.round((matches / answerWords.length) * 100)) : 0;
+      const score = calculateScore(modelAnswer, currentTranscript);
       setScores(prev => ({ ...prev, [questionId]: score }));
     };
 
@@ -253,17 +263,29 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
                   <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '8px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                       <span style={{ fontSize: '0.8125rem', color: '#F0F4F8', fontWeight: 600 }}>Practice Your Answer</span>
-                      {activeRecordingId === question.id ? (
-                        <button onClick={(e) => { e.stopPropagation(); stopRecording(); }} style={{ background: '#EF4444', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
-                          ⏹ Stop
-                        </button>
-                      ) : (
-                        <button onClick={(e) => { e.stopPropagation(); startRecording(question.id, question.modelAnswer); }} style={{ background: 'rgba(0, 217, 245, 0.2)', color: '#00D9F5', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
-                          🎤 Start Recording
-                        </button>
+                      {hasSpeechSupport && (
+                        activeRecordingId === question.id ? (
+                          <button onClick={(e) => { e.stopPropagation(); stopRecording(); }} style={{ background: '#EF4444', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                            ⏹ Stop
+                          </button>
+                        ) : (
+                          <button onClick={(e) => { e.stopPropagation(); startRecording(question.id, question.modelAnswer); }} style={{ background: 'rgba(0, 217, 245, 0.2)', color: '#00D9F5', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}>
+                            🎤 Start Recording
+                          </button>
+                        )
                       )}
                     </div>
-                    {transcripts[question.id] !== undefined && (
+                    
+                    {!hasSpeechSupport && (
+                      <textarea
+                        value={transcripts[question.id] || ''}
+                        onChange={(e) => handleManualInput(question.id, question.modelAnswer, e.target.value)}
+                        placeholder="Speech API not supported in this browser. Type your response here..."
+                        style={{ width: '100%', minHeight: '80px', background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', padding: '0.75rem', borderRadius: '4px', fontSize: '0.8125rem', marginTop: '0.5rem' }}
+                      />
+                    )}
+
+                    {hasSpeechSupport && transcripts[question.id] !== undefined && (
                       <div style={{ fontSize: '0.8125rem', color: '#94A3B8', fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '4px' }}>
                         "{transcripts[question.id]}"
                       </div>

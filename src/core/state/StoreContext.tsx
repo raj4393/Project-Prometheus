@@ -11,6 +11,7 @@ import {
   useContext,
   useReducer,
   useMemo,
+  useEffect,
   type ReactNode,
   type Dispatch,
 } from 'react';
@@ -48,7 +49,11 @@ const INITIAL_STATE: AppState = {
   isAudioEnabled: false,
   presetBlueprints: ALL_PRESET_BLUEPRINTS,
   savedBlueprints: [],
+  literature: [],
+  facultyAssessment: null,
 };
+
+const STATE_STORAGE_KEY = 'prometheus_global_state';
 
 /**
  * React Context for global application state.
@@ -82,7 +87,33 @@ interface StoreProviderProps {
  * ```
  */
 export function StoreProvider({ children, initialState }: StoreProviderProps): React.JSX.Element {
-  const [state, dispatch] = useReducer(projectReducer, initialState ?? INITIAL_STATE);
+  // Try to load state from localStorage if no initialState is provided
+  const loadInitial = () => {
+    if (initialState) return initialState;
+    try {
+      const stored = localStorage.getItem(STATE_STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Ensure presetBlueprints are always fresh from code, not storage
+        return { ...INITIAL_STATE, ...parsed, presetBlueprints: INITIAL_STATE.presetBlueprints };
+      }
+    } catch {}
+    return INITIAL_STATE;
+  };
+
+  const [state, dispatch] = useReducer(projectReducer, loadInitial());
+
+  // Debounced save to localStorage
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      try {
+        // Exclude presetBlueprints to save space
+        const { presetBlueprints, ...stateToSave } = state;
+        localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(stateToSave));
+      } catch {}
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [state]);
 
   const contextValue = useMemo<StoreContextValue>(
     () => ({ state, dispatch }),

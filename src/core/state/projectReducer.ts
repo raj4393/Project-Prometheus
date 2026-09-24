@@ -9,6 +9,7 @@ import type { StudentProfile } from '../../domain/contracts/student.contract';
 import type { BlueprintContract } from '../../domain/contracts/blueprint.contract';
 import type { RoadmapContract } from '../../domain/contracts/roadmap.contract';
 import type { DefenseContract } from '../../domain/contracts/defense.contract';
+import type { LiteratureEntry } from '../../domain/contracts/literature.contract';
 import { MilestoneState, computeCompletionPercentage } from '../../domain/contracts/roadmap.contract';
 
 /**
@@ -25,7 +26,19 @@ export enum EngineStatus {
 /**
  * Active navigation tab in the main interface.
  */
-export type ActiveTab = 'intake' | 'blueprint' | 'roadmap' | 'defense';
+export type ActiveTab = 'intake' | 'literature' | 'blueprint' | 'roadmap' | 'defense' | 'visualizer' | 'assessment';
+
+export interface ReviewAssessment {
+  readonly score: number;
+  readonly remarks: string;
+  readonly date: string;
+}
+
+export interface FacultyAssessment {
+  readonly review0: ReviewAssessment; // out of 20
+  readonly review1: ReviewAssessment; // out of 30
+  readonly review2: ReviewAssessment; // out of 50
+}
 
 /**
  * Complete application state contract.
@@ -50,6 +63,8 @@ export interface AppState {
   readonly isAudioEnabled: boolean;
   readonly presetBlueprints: ReadonlyArray<BlueprintContract>;
   readonly savedBlueprints: ReadonlyArray<BlueprintContract>;
+  readonly literature: ReadonlyArray<LiteratureEntry>;
+  readonly facultyAssessment: FacultyAssessment | null;
 }
 
 /**
@@ -69,6 +84,12 @@ export type AppAction =
   | { readonly type: 'SELECT_PRESET'; readonly payload: BlueprintContract }
   | { readonly type: 'SAVE_BLUEPRINT'; readonly payload: BlueprintContract }
   | { readonly type: 'REMOVE_SAVED_BLUEPRINT'; readonly payload: string }
+  | { readonly type: 'ADD_LITERATURE_ENTRY'; readonly payload: LiteratureEntry }
+  | { readonly type: 'REMOVE_LITERATURE_ENTRY'; readonly payload: string }
+  | { readonly type: 'UPDATE_LITERATURE_ENTRY'; readonly payload: LiteratureEntry }
+  | { readonly type: 'UPDATE_ASSESSMENT'; readonly payload: Partial<FacultyAssessment> }
+  | { readonly type: 'LOAD_DEMO' }
+  | { readonly type: 'RESTORE_STATE'; readonly payload: AppState }
   | { readonly type: 'TOGGLE_AUDIO' }
   | { readonly type: 'RESET' };
 
@@ -212,6 +233,54 @@ export function projectReducer(state: AppState, action: AppAction): AppState {
         savedBlueprints: state.savedBlueprints.filter(bp => bp.slug !== action.payload) 
       };
 
+    case 'ADD_LITERATURE_ENTRY':
+      return { ...state, literature: [...state.literature, action.payload] };
+
+    case 'REMOVE_LITERATURE_ENTRY':
+      return { ...state, literature: state.literature.filter(l => l.id !== action.payload) };
+
+    case 'UPDATE_LITERATURE_ENTRY':
+      return { 
+        ...state, 
+        literature: state.literature.map(l => l.id === action.payload.id ? action.payload : l) 
+      };
+
+    case 'UPDATE_ASSESSMENT':
+      return {
+        ...state,
+        facultyAssessment: state.facultyAssessment 
+          ? { ...state.facultyAssessment, ...action.payload }
+          : { 
+              review0: { score: 0, remarks: '', date: '' },
+              review1: { score: 0, remarks: '', date: '' },
+              review2: { score: 0, remarks: '', date: '' },
+              ...action.payload 
+            }
+      };
+
+    case 'RESTORE_STATE':
+      return { ...action.payload, presetBlueprints: state.presetBlueprints }; // Don't override presets
+
+    case 'LOAD_DEMO':
+      if (state.presetBlueprints.length === 0) return state;
+      const demoBlueprint = state.presetBlueprints[0];
+      return {
+        ...state,
+        profile: { studentName: 'Jane Doe', skills: [], domains: [], timeFrame: '12 Weeks' as any, ambition: 'Ambitious' as any, teamSize: 1 },
+        blueprint: demoBlueprint,
+        roadmap: { projectId: demoBlueprint.id, phases: [], completedMilestones: 0, totalMilestones: 12 }, // Minimal mock
+        defense: { projectId: demoBlueprint.id, totalQuestions: 1, questions: [{ id: 'q1', question: 'Why this architecture?', modelAnswer: 'Demo answer', difficulty: 'Foundational' as any, category: 'System Architecture' as any, scoringRubric: 'Demo rubric', isRevealed: false }] },
+        literature: [
+          { id: 'lit1', title: 'Deep Learning for Edge Devices', authors: 'Smith et al., 2023', source: 'IEEE TNNLS', methodology: 'Quantization-aware training', limitations: 'High inference latency on older MCUs', novelty: 'Proposed hybrid INT8/INT4 quantization' }
+        ],
+        facultyAssessment: {
+          review0: { score: 18, remarks: 'Good synopsis.', date: '2026-09-01' },
+          review1: { score: 25, remarks: 'Architecture is solid.', date: '2026-09-15' },
+          review2: { score: 45, remarks: 'Excellent defense.', date: '2026-09-24' }
+        },
+        activeTab: 'blueprint',
+      };
+
     case 'TOGGLE_AUDIO':
       return { ...state, isAudioEnabled: !state.isAudioEnabled };
 
@@ -226,6 +295,8 @@ export function projectReducer(state: AppState, action: AppAction): AppState {
         isGenerating: false,
         isAudioEnabled: false,
         savedBlueprints: [],
+        literature: [],
+        facultyAssessment: null,
       };
 
     default:
