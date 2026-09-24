@@ -5,7 +5,7 @@ import React from 'react';
  * managing navigation state, and coordinating synthesis workflows.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useStore } from './core/state/StoreContext';
 import { EngineStatus, type ActiveTab } from './core/state/projectReducer';
 import type { SkillEntry, StudentProfile } from './domain/contracts/student.contract';
@@ -53,6 +53,18 @@ export default function App(): React.JSX.Element {
   const [teamSize, setTeamSize] = useState(1);
   const [latency, setLatency] = useState<number | null>(null);
   const [showIeeeModal, setShowIeeeModal] = useState(false);
+
+  /**
+   * Mouse Spotlight Listener
+   */
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      document.documentElement.style.setProperty('--mouse-x', `${e.clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${e.clientY}px`);
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   /**
    * Handles the project synthesis workflow.
