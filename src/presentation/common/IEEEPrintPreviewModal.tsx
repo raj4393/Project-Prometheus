@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import type { BlueprintContract } from '../../domain/contracts/blueprint.contract';
 import type { RoadmapContract } from '../../domain/contracts/roadmap.contract';
 import { generateIEEEMarkdown } from '../../infrastructure/serialization/ieeeMarkdownExporter';
-import { SurfaceCard } from '../design-system/SurfaceCard';
 import { CyberAction } from '../design-system/CyberAction';
 
 interface IEEEPrintPreviewModalProps {
@@ -13,23 +12,17 @@ interface IEEEPrintPreviewModalProps {
 }
 
 export function IEEEPrintPreviewModal({ blueprint, roadmap, studentName, onClose }: IEEEPrintPreviewModalProps): React.JSX.Element {
-  const [htmlContent, setHtmlContent] = useState<string>('');
-
-  useEffect(() => {
-    // Basic Markdown to HTML conversion for preview purposes
-    const md = generateIEEEMarkdown(blueprint, roadmap, studentName);
-    const html = md
-      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
-      .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>')
-      .replace(/---/gim, '<hr/>')
-      .replace(/\n/gim, '<br/>');
-    
-    setHtmlContent(html);
-  }, [blueprint, roadmap, studentName]);
+  // Basic Markdown to HTML conversion for preview purposes
+  const md = generateIEEEMarkdown(blueprint, roadmap, studentName);
+  const htmlContent = md
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+    .replace(/^\* (.*$)/gim, '<ul><li>$1</li></ul>')
+    .replace(/^- (.*$)/gim, '<ul><li>$1</li></ul>')
+    .replace(/---/gim, '<hr/>')
+    .replace(/\n/gim, '<br/>');
 
   return (
     <div style={{

@@ -108,7 +108,7 @@ export function StoreProvider({ children, initialState }: StoreProviderProps): R
     const timer = setTimeout(() => {
       try {
         // Exclude presetBlueprints to save space
-        const { presetBlueprints, ...stateToSave } = state;
+        const { presetBlueprints: _presetBlueprints, ...stateToSave } = state;
         localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(stateToSave));
       } catch {}
     }, 1000);

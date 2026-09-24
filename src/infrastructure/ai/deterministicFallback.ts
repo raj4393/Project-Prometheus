@@ -6,7 +6,7 @@
  * when the Gemini API is unavailable.
  */
 
-import type { StudentProfile, SkillTag, DomainPillar } from '../../domain/contracts/student.contract';
+import type { StudentProfile } from '../../domain/contracts/student.contract';
 import {
   type BlueprintContract,
   type TechStackEntry,

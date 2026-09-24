@@ -2,7 +2,7 @@ import React from 'react';
 import type { BlueprintContract } from '../../../domain/contracts/blueprint.contract';
 import type { RoadmapContract } from '../../../domain/contracts/roadmap.contract';
 import type { DefenseContract } from '../../../domain/contracts/defense.contract';
-import { MilestoneState } from '../../../domain/contracts/roadmap.contract';
+
 
 interface AcademicRubricProps {
   readonly blueprint: BlueprintContract;
