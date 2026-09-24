@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { synthesizeProject } from '../infrastructure/ai/deterministicFallback';
-import { SkillTag, ProficiencyLevel, DomainPillar, TimeFrame, AmbitionLevel } from '../domain/contracts/student.contract';
+import { ProficiencyLevel, DomainPillar, TimeFrame, AmbitionLevel, type SkillTag } from '../domain/contracts/student.contract';
 import type { StudentProfile } from '../domain/contracts/student.contract';
 
 describe('synthesizeProject', () => {
@@ -14,9 +14,9 @@ describe('synthesizeProject', () => {
     const profile: StudentProfile = {
       studentName: 'Alice',
       skills: [
-        { tag: SkillTag.Python, proficiency: ProficiencyLevel.Advanced },
-        { tag: SkillTag.PyTorch, proficiency: ProficiencyLevel.Intermediate },
-        { tag: SkillTag.React, proficiency: ProficiencyLevel.Intermediate },
+        { tag: 'Python', proficiency: ProficiencyLevel.Advanced },
+        { tag: 'PyTorch', proficiency: ProficiencyLevel.Intermediate },
+        { tag: 'React', proficiency: ProficiencyLevel.Intermediate },
       ],
       domains: [DomainPillar.HealthTech],
       timeFrame: TimeFrame.TwelveWeeks,
@@ -43,8 +43,8 @@ describe('synthesizeProject', () => {
     const profile: StudentProfile = {
       studentName: 'Bob',
       skills: [
-        { tag: SkillTag.JavaScript, proficiency: ProficiencyLevel.Expert },
-        { tag: SkillTag.Docker, proficiency: ProficiencyLevel.Advanced },
+        { tag: 'JavaScript', proficiency: ProficiencyLevel.Expert },
+        { tag: 'Docker', proficiency: ProficiencyLevel.Advanced },
       ],
       domains: [DomainPillar.Cybersecurity],
       timeFrame: TimeFrame.EightWeeks,
@@ -83,7 +83,7 @@ describe('synthesizeProject', () => {
   it('should produce different titles for different domains', () => {
     const baseProfile: Omit<StudentProfile, 'domains'> = {
       studentName: 'Diana',
-      skills: [{ tag: SkillTag.Python, proficiency: ProficiencyLevel.Intermediate }],
+      skills: [{ tag: 'Python', proficiency: ProficiencyLevel.Intermediate }],
       timeFrame: TimeFrame.TwelveWeeks,
       ambition: AmbitionLevel.Ambitious,
       teamSize: 1,
@@ -108,9 +108,9 @@ describe('synthesizeProject', () => {
     const expertProfile: StudentProfile = {
       studentName: 'Expert Eve',
       skills: [
-        { tag: SkillTag.Python, proficiency: ProficiencyLevel.Expert },
-        { tag: SkillTag.React, proficiency: ProficiencyLevel.Expert },
-        { tag: SkillTag.Docker, proficiency: ProficiencyLevel.Expert },
+        { tag: 'Python', proficiency: ProficiencyLevel.Expert },
+        { tag: 'React', proficiency: ProficiencyLevel.Expert },
+        { tag: 'Docker', proficiency: ProficiencyLevel.Expert },
       ],
       domains: [DomainPillar.EdTech],
       timeFrame: TimeFrame.TwelveWeeks,
@@ -121,7 +121,7 @@ describe('synthesizeProject', () => {
     const beginnerProfile: StudentProfile = {
       studentName: 'Beginner Ben',
       skills: [
-        { tag: SkillTag.Python, proficiency: ProficiencyLevel.Beginner },
+        { tag: 'Python', proficiency: ProficiencyLevel.Beginner },
       ],
       domains: [DomainPillar.EdTech],
       timeFrame: TimeFrame.TwelveWeeks,
@@ -138,7 +138,7 @@ describe('synthesizeProject', () => {
   it('should generate valid slug from the title', () => {
     const profile: StudentProfile = {
       studentName: 'Frank',
-      skills: [{ tag: SkillTag.TypeScript, proficiency: ProficiencyLevel.Advanced }],
+      skills: [{ tag: 'TypeScript', proficiency: ProficiencyLevel.Advanced }],
       domains: [DomainPillar.FinTech],
       timeFrame: TimeFrame.TwelveWeeks,
       ambition: AmbitionLevel.Ambitious,
@@ -155,7 +155,7 @@ describe('synthesizeProject', () => {
   it('should set novelty based on ambition level', () => {
     const moonshot: StudentProfile = {
       studentName: 'Grace',
-      skills: [{ tag: SkillTag.Rust, proficiency: ProficiencyLevel.Advanced }],
+      skills: [{ tag: 'Rust', proficiency: ProficiencyLevel.Advanced }],
       domains: [DomainPillar.CyberPhysical],
       timeFrame: TimeFrame.SixteenWeeks,
       ambition: AmbitionLevel.Moonshot,

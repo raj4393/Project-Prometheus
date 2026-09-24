@@ -5,37 +5,7 @@
  * the capstone project generation pipeline.
  */
 
-/**
- * Enumeration of recognized technical skill categories.
- * Each skill maps to a specific technology or framework
- * that can be leveraged in capstone project generation.
- */
-export enum SkillTag {
-  Python = 'Python',
-  JavaScript = 'JavaScript',
-  TypeScript = 'TypeScript',
-  React = 'React',
-  NextJS = 'Next.js',
-  NodeJS = 'Node.js',
-  PyTorch = 'PyTorch',
-  TensorFlow = 'TensorFlow',
-  Docker = 'Docker',
-  Kubernetes = 'Kubernetes',
-  Rust = 'Rust',
-  Go = 'Go',
-  PostgreSQL = 'PostgreSQL',
-  MongoDB = 'MongoDB',
-  Redis = 'Redis',
-  GraphQL = 'GraphQL',
-  AWS = 'AWS',
-  GCP = 'GCP',
-  Flutter = 'Flutter',
-  Swift = 'Swift',
-  OpenCV = 'OpenCV',
-  LangChain = 'LangChain',
-  Solidity = 'Solidity',
-  ROS = 'ROS',
-}
+export type SkillTag = string;
 
 /**
  * Proficiency level for a given skill.
