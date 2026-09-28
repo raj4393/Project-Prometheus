@@ -8,7 +8,6 @@ import React from 'react';
 import { useCallback } from 'react';
 import type { ActiveTab } from '../../core/state/projectReducer';
 import { EngineStatus } from '../../core/state/projectReducer';
-import { MetricsBadge } from '../design-system/MetricsBadge';
 
 /**
  * Navigation tab configuration.

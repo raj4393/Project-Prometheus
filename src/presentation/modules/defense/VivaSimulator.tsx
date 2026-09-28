@@ -72,9 +72,10 @@ export function VivaSimulator({ defense, onToggleReveal }: VivaSimulatorProps): 
 
   // Clean up AudioContext on unmount
   React.useEffect(() => {
-    return () => {
+    const cleanup = () => {
       stopAudioVisualizer();
     };
+    return cleanup;
   }, []);
 
   const hasSpeechSupport = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);

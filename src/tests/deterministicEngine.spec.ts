@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { synthesizeProject } from '../infrastructure/ai/deterministicFallback';
-import { ProficiencyLevel, DomainPillar, TimeFrame, AmbitionLevel, type SkillTag } from '../domain/contracts/student.contract';
+import { ProficiencyLevel, DomainPillar, TimeFrame, AmbitionLevel } from '../domain/contracts/student.contract';
 import type { StudentProfile } from '../domain/contracts/student.contract';
 
 describe('synthesizeProject', () => {
