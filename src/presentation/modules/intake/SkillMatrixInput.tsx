@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { ProficiencyLevel, type SkillTag, type SkillEntry } from '../../../domain/contracts/student.contract';
-import { CyberAction } from '../../design-system/CyberAction';
 import { SurfaceCard } from '../../design-system/SurfaceCard';
 
 export const SKILL_GROUPS = [
@@ -83,8 +82,6 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
   const hasDatabase = selectedSkills.some(s => SKILL_GROUPS[5].skills.includes(s.tag));
   const hasAI = selectedSkills.some(s => SKILL_GROUPS[3].skills.includes(s.tag));
 
-  const isFullStack = hasLanguage && hasBackend && hasDatabase;
-  const needsBackendForAI = hasAI && !hasBackend;
 
   const filteredGroups = useMemo(() => {
     let groups = SKILL_GROUPS;

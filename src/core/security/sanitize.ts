@@ -77,3 +77,16 @@ export function sanitizeObject<T extends Record<string, unknown>>(obj: T): T {
   }
   return result as T;
 }
+
+/**
+ * Escapes characters for HTML output.
+ */
+export function escapeHtml(input: string): string {
+  if (!input) return '';
+  return input
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}

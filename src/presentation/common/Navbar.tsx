@@ -64,7 +64,7 @@ function mapEngineStatusToBadge(status: EngineStatus): 'online' | 'offline' | 'w
  * @param props - Component configuration
  * @returns The rendered navigation bar
  */
-export function Navbar({ activeTab, onTabChange, engineStatus, isAudioEnabled, onToggleAudio, onLoadDemo, onExportProject, onImportProject, readinessScore }: NavbarProps): React.JSX.Element {
+export function Navbar({ activeTab, onTabChange, engineStatus: _engineStatus, isAudioEnabled: _isAudioEnabled, onToggleAudio: _onToggleAudio, onLoadDemo, onExportProject, onImportProject, readinessScore }: NavbarProps): React.JSX.Element {
   const handleTabClick = useCallback(
     (tab: ActiveTab) => {
       onTabChange(tab);

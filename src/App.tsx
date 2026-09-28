@@ -13,12 +13,11 @@ import { TimeFrame, AmbitionLevel, type DomainPillar } from './domain/contracts/
 import { generateDefaultRoadmap, generateDefaultDefense } from './domain/models/projectPresets';
 import { generateBlueprint } from './infrastructure/ai/geminiClient';
 import { downloadIEEESynopsis } from './infrastructure/serialization/ieeeMarkdownExporter';
-import { sanitizeInput } from './core/security/sanitize';
+
 import { ErrorBoundary } from './core/security/ErrorBoundary';
 import { playClick, playSweep, playSuccess } from './core/audio/SoundEngine';
 
 import { Navbar } from './presentation/common/Navbar';
-import { LiveStatusBar } from './presentation/common/LiveStatusBar';
 import { SkillMatrixInput, SKILL_GROUPS } from './presentation/modules/intake/SkillMatrixInput';
 import { DomainSelector } from './presentation/modules/intake/DomainSelector';
 import { ArchitectureTopology } from './presentation/modules/synthesis/ArchitectureTopology';
@@ -80,7 +79,7 @@ export default function App(): React.JSX.Element {
     if (skills.length === 0 || domains.length === 0) return;
 
     const profile: StudentProfile = {
-      studentName: sanitizeInput(studentName) || 'Student',
+      studentName: studentName.trim().slice(0, 80) || 'Student',
       skills: [...skills],
       domains: [...domains],
       timeFrame,
@@ -351,9 +350,10 @@ export default function App(): React.JSX.Element {
                                 fontSize: '0.75rem',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s',
+                                whiteSpace: 'nowrap',
                               }}
                             >
-                              {tf.replace('Weeks', 'w')}
+                              {tf.replace(' Weeks', 'w')}
                             </button>
                           ))}
                         </div>
@@ -452,7 +452,11 @@ export default function App(): React.JSX.Element {
                     </div>
                     
                     <div style={{ marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                      {!skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) || !skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) || !skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? (
+                      {skills.length === 0 ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(203, 213, 225, 0.1)', border: '1px solid rgba(203, 213, 225, 0.2)', borderRadius: '6px', color: '#cbd5e1', fontSize: '0.75rem', fontWeight: 500 }}>
+                          Select core skills to evaluate stack health.
+                        </div>
+                      ) : !skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) || !skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) || !skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', color: '#F59E0B', fontSize: '0.75rem', fontWeight: 500 }}>
                           ⚠️ Warning: Add missing core layers (Frontend/Backend/DB) to complete architecture.
                         </div>
@@ -721,10 +725,10 @@ export default function App(): React.JSX.Element {
               No Blueprint Generated Yet
             </h3>
             <p style={{ color: '#94A3B8', fontSize: '0.9375rem', marginBottom: '1.5rem', maxWidth: '480px', margin: '0 auto 1.5rem' }}>
-              Head to the Profile tab to enter your skills and interests, then generate a tailored capstone blueprint.
+              Head to the Scope tab to enter your skills and interests, then generate a tailored capstone blueprint.
             </p>
-            <CyberAction variant="primary" onClick={() => handleTabChange('intake')} ariaLabel="Go to profile tab">
-              → Go to Profile
+            <CyberAction variant="primary" onClick={() => handleTabChange('intake')} ariaLabel="Go to scope tab">
+              → Go to Scope
             </CyberAction>
           </div>
         )}
@@ -754,7 +758,7 @@ export default function App(): React.JSX.Element {
         {/* Left: Live Autosave Beacon */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span style={{ color: '#10b981', animation: 'pulse-dot 2s infinite' }}>●</span> 
-          State Engine: Synced ({new Date().toLocaleTimeString('en-US', { hour12: false })})
+          Progress autosaved in this browser
         </div>
         
         {/* Center: Interactive Hotkey Tags */}
@@ -774,9 +778,7 @@ export default function App(): React.JSX.Element {
         
         {/* Right: System Health */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ color: '#10b981' }}>Vitest: 41 Passed</span>
-          <span>|</span>
-          <span style={{ color: '#cbd5e1' }}>TS: Strict Validated</span>
+          <span style={{ color: '#10b981' }}>{state.engineStatus}{latency ? ` | Last run: ${latency} ms` : ''}</span>
         </div>
       </div>
 
