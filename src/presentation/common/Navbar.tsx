@@ -100,8 +100,9 @@ export function Navbar({ activeTab, onTabChange, engineStatus: _engineStatus, is
           margin: 0,
           color: '#ffffff',
           letterSpacing: '0.05em',
+          fontFamily: 'monospace',
         }}>
-          PROMETHEUS
+          ⚡ ARCHON OS // Capstone Compiler
         </h1>
 
       </div>

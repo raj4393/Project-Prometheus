@@ -30,3 +30,4 @@ scratch
 *.tsbuildinfo
 
 *.tsbuildinfo
+.vercel

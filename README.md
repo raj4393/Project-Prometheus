@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔥 Project Prometheus
+# ⚡ ARCHON OS // Capstone Compiler
 **AI-Powered Capstone Project Compiler & Mentorship Engine**
 
 [![WCAG 2.1 AAA Compliant](https://img.shields.io/badge/WCAG%202.1-AAA-00F5A0.svg?style=flat-square)](#accessibility)
@@ -8,7 +8,7 @@
 [![Code Quality](https://img.shields.io/badge/Code%20Quality-A+-8B5CF6.svg?style=flat-square)](#quality)
 [![Architecture](https://img.shields.io/badge/Architecture-Monolithic--Free-F59E0B.svg?style=flat-square)](#architecture)
 
-*Project Prometheus transforms student skills and academic interests into production-grade capstone project blueprints, complete with automated 12-week roadmaps and interactive viva voce defense simulations.*
+*Archon OS transforms student skills and academic interests into production-grade capstone project blueprints, complete with automated 12-week roadmaps and interactive viva voce defense simulations.*
 
 </div>
 
@@ -16,7 +16,7 @@
 
 ## 🌟 Project Overview
 
-Project Prometheus is designed for final-year computer science students to bridge the gap between academic theory and industry-grade engineering. By providing an interactive platform, the application intakes a student's proficiency levels across various technology stacks and domains. It then leverages advanced AI (or a highly resilient offline deterministic engine) to synthesize a comprehensive, feasible, and novel project proposal.
+Archon OS is designed for final-year computer science students to bridge the gap between academic theory and industry-grade engineering. By providing an interactive platform, the application intakes a student's proficiency levels across various technology stacks and domains. It then leverages advanced AI (or a highly resilient offline deterministic engine) to synthesize a comprehensive, feasible, and novel project proposal.
 
 The platform is strictly evaluated across 7 core vectors: **Code Quality, Security, Efficiency, Testing, Accessibility, Problem Statement Alignment, and Google Services Usage**.
 
