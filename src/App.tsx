@@ -52,6 +52,8 @@ export default function App(): React.JSX.Element {
   const [teamSize, setTeamSize] = useState(1);
   const [latency, setLatency] = useState<number | null>(null);
   const [showIeeeModal, setShowIeeeModal] = useState(false);
+  const [activeSubStep, setActiveSubStep] = useState(1);
+  const [slideDirection, setSlideDirection] = useState<'forward' | 'back'>('forward');
 
   /**
    * Mouse Spotlight Listener with rAF throttling
@@ -234,9 +236,20 @@ export default function App(): React.JSX.Element {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeElement = document.activeElement as HTMLElement;
-      if (activeElement && (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName) || activeElement.isContentEditable)) {
-        return;
+      const isInput = activeElement && (['INPUT', 'TEXTAREA', 'SELECT'].includes(activeElement.tagName) || activeElement.isContentEditable);
+
+      if (state.activeTab === 'intake') {
+        if (e.key === 'Enter') {
+          if (!isInput || (e.key === 'Enter' && activeElement.tagName === 'INPUT' && !e.shiftKey)) {
+            if (activeSubStep < 3) {
+              setSlideDirection('forward');
+              setActiveSubStep(prev => prev + 1);
+            }
+          }
+        }
       }
+
+      if (isInput) return;
       
       switch(e.key.toLowerCase()) {
         case '1': handleTabChange('intake'); break;
@@ -250,20 +263,14 @@ export default function App(): React.JSX.Element {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleTabChange]);
+  }, [handleTabChange, state.activeTab, activeSubStep]);
 
   return (
     <div style={{
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      background: '#050608',
-      backgroundImage: `
-        radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(6, 182, 212, 0.08), transparent 75%),
-        radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px)
-      `,
-      backgroundSize: '100% 100%, 20px 20px',
-      backgroundAttachment: 'fixed',
+      background: '#0b0f19',
     }}>
       <Navbar
         activeTab={state.activeTab}
@@ -308,221 +315,152 @@ export default function App(): React.JSX.Element {
               </p>
             </div>
 
-            {/* Bento-Grid Layout */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: '1.25rem', maxWidth: '80rem', margin: '0 auto', padding: '1.5rem' }}>
-              {/* Left Grid (col-span-4) */}
-              <div style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <SurfaceCard ariaLabel="Student information" as="section" style={{ padding: '1.25rem' }}>
-                  <h3 style={{ color: '#f3f4f6', fontSize: '1rem', fontWeight: 600, marginTop: 0, marginBottom: '1rem' }}>
-                    Project Parameters
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    {/* Student Name */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      <label htmlFor="student-name" style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>
-                        Student Name
-                      </label>
-                      <input
-                        id="student-name"
-                        type="text"
-                        value={studentName}
-                        onChange={(e) => setStudentName(e.target.value)}
-                        placeholder="Enter full name"
-                        style={{
-                          background: '#090a0f',
-                          border: '1px solid #1e2230',
-                          borderRadius: '6px',
-                          padding: '0.5rem 0.75rem',
-                          color: '#f3f4f6',
-                          fontSize: '0.875rem',
-                          outline: 'none',
-                          transition: 'all 0.2s',
+                {/* Multi-Step Form Layout */}
+                <div style={{ maxWidth: '48rem', margin: '2rem auto', padding: '2rem', background: '#111827', borderRadius: '12px', border: '1px solid #1f2937', display: 'flex', flexDirection: 'column', gap: '2.5rem', overflow: 'hidden' }}>
+                  
+                  <div style={{ padding: '0.75rem', background: '#0b0f19', borderRadius: '8px', border: '1px solid #1f2937', color: '#9ca3af', fontSize: '0.8125rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span>
+                      Configured: {studentName || 'Student'} | {timeFrame} 
+                    </span>
+                    <span style={{ display: 'flex', gap: '0.5rem', fontWeight: 600 }}>
+                      {skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) && <span style={{ color: '#10b981' }}>FE</span>}
+                      {skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) && <span style={{ color: '#3b82f6' }}>BE</span>}
+                      {skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) && <span style={{ color: '#06b6d4' }}>DB</span>}
+                    </span>
+                  </div>
+
+                  <div style={{ position: 'relative', minHeight: '400px' }}>
+                    <div style={{
+                      position: activeSubStep === 1 ? 'relative' : 'absolute',
+                      top: 0, left: 0, right: 0,
+                      opacity: activeSubStep === 1 ? 1 : 0,
+                      pointerEvents: activeSubStep === 1 ? 'auto' : 'none',
+                      transform: activeSubStep === 1 ? 'translateX(0)' : (activeSubStep > 1 ? (slideDirection === 'forward' ? 'translateX(-20px)' : 'translateX(20px)') : 'translateX(20px)'),
+                      transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}>
+                      <SurfaceCard ariaLabel="Student information" as="section" style={{ padding: '1.25rem' }}>
+                        <h3 style={{ color: '#f3f4f6', fontSize: '1rem', fontWeight: 600, marginTop: 0, marginBottom: '1rem' }}>
+                          Project Parameters
+                        </h3>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                            <label htmlFor="student-name" style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>Student Name</label>
+                            <input id="student-name" type="text" value={studentName} onChange={(e) => setStudentName(e.target.value)} placeholder="Enter full name"
+                              style={{ background: '#090a0f', border: '1px solid #1e2230', borderRadius: '6px', padding: '0.5rem 0.75rem', color: '#f3f4f6', fontSize: '0.875rem', outline: 'none', transition: 'all 0.2s' }}
+                              onFocus={(e) => { e.currentTarget.style.borderColor = '#9ca3af'; }} onBlur={(e) => { e.currentTarget.style.borderColor = '#1e2230'; }}
+                            />
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                              <label style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>Timeline</label>
+                              <div style={{ display: 'flex', background: '#090a0f', borderRadius: '6px', border: '1px solid #1e2230', overflow: 'hidden' }}>
+                                {Object.values(TimeFrame).map(tf => (
+                                  <button key={tf} onClick={() => setTimeFrame(tf)} style={{ flex: 1, padding: '0.5rem', background: timeFrame === tf ? '#1e2230' : 'transparent', color: timeFrame === tf ? '#f3f4f6' : '#64748b', border: 'none', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
+                                    {tf.replace(' Weeks', 'w')}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                              <label style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>Team Size</label>
+                              <div style={{ display: 'flex', alignItems: 'center', background: '#090a0f', borderRadius: '6px', border: '1px solid #1e2230', overflow: 'hidden' }}>
+                                <button onClick={() => setTeamSize(Math.max(1, teamSize - 1))} style={{ padding: '0.5rem 0.75rem', background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}>-</button>
+                                <span style={{ flex: 1, textAlign: 'center', color: '#f3f4f6', fontSize: '0.875rem' }}>{teamSize}</span>
+                                <button onClick={() => setTeamSize(Math.min(5, teamSize + 1))} style={{ padding: '0.5rem 0.75rem', background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}>+</button>
+                              </div>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                            <label style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>Ambition Tier</label>
+                            <div style={{ display: 'flex', background: '#090a0f', borderRadius: '6px', border: '1px solid #1e2230', overflow: 'hidden', padding: '2px' }}>
+                              {Object.values(AmbitionLevel).map((al) => (
+                                <button key={al} onClick={() => setAmbition(al)} style={{ flex: 1, padding: '0.5rem', background: ambition === al ? '#1e2230' : 'transparent', color: ambition === al ? '#f3f4f6' : '#64748b', border: 'none', borderRadius: '4px', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }}>
+                                  {al === 'Practical' ? 'Minimalist' : al}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </SurfaceCard>
+                    </div>
+
+                    <div style={{
+                      position: activeSubStep === 2 ? 'relative' : 'absolute',
+                      top: 0, left: 0, right: 0,
+                      opacity: activeSubStep === 2 ? 1 : 0,
+                      pointerEvents: activeSubStep === 2 ? 'auto' : 'none',
+                      transform: activeSubStep === 2 ? 'translateX(0)' : (activeSubStep > 2 ? (slideDirection === 'forward' ? 'translateX(-20px)' : 'translateX(20px)') : (slideDirection === 'back' ? 'translateX(20px)' : 'translateX(-20px)')),
+                      transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}>
+                      <SkillMatrixInput selectedSkills={skills} onSkillsChange={setSkills} />
+                    </div>
+
+                    <div style={{
+                      position: activeSubStep === 3 ? 'relative' : 'absolute',
+                      top: 0, left: 0, right: 0,
+                      opacity: activeSubStep === 3 ? 1 : 0,
+                      pointerEvents: activeSubStep === 3 ? 'auto' : 'none',
+                      transform: activeSubStep === 3 ? 'translateX(0)' : (slideDirection === 'forward' ? 'translateX(-20px)' : 'translateX(20px)'),
+                      transition: 'all 250ms cubic-bezier(0.16, 1, 0.3, 1)',
+                    }}>
+                      <DomainSelector selectedDomains={domains} onDomainsChange={setDomains} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem', borderTop: '1px solid #1f2937', paddingTop: '1.5rem' }}>
+                    <button
+                      onClick={() => {
+                        if (activeSubStep > 1) {
+                          setSlideDirection('back');
+                          setActiveSubStep(prev => prev - 1);
+                        }
+                      }}
+                      style={{
+                        padding: '0.75rem 1.25rem',
+                        background: 'transparent',
+                        border: '1px solid #374151',
+                        color: activeSubStep > 1 ? '#d1d5db' : '#4b5563',
+                        borderRadius: '6px',
+                        cursor: activeSubStep > 1 ? 'pointer' : 'not-allowed',
+                        fontFamily: 'monospace',
+                        opacity: activeSubStep > 1 ? 1 : 0.5,
+                      }}
+                    >
+                      [ Esc Back ]
+                    </button>
+                    {activeSubStep < 3 ? (
+                      <button
+                        onClick={() => {
+                          setSlideDirection('forward');
+                          setActiveSubStep(prev => prev + 1);
                         }}
-                        onFocus={(e) => { e.currentTarget.style.borderColor = '#06b6d4'; }}
-                        onBlur={(e) => { e.currentTarget.style.borderColor = '#1e2230'; }}
-                      />
-                    </div>
-
-                    {/* Timeline & Team Size Row */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                        <label style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>Timeline</label>
-                        <div style={{ display: 'flex', background: '#090a0f', borderRadius: '6px', border: '1px solid #1e2230', overflow: 'hidden' }}>
-                          {Object.values(TimeFrame).map(tf => (
-                            <button
-                              key={tf}
-                              onClick={() => setTimeFrame(tf)}
-                              style={{
-                                flex: 1,
-                                padding: '0.5rem',
-                                background: timeFrame === tf ? '#1e2230' : 'transparent',
-                                color: timeFrame === tf ? '#f3f4f6' : '#64748b',
-                                border: 'none',
-                                fontSize: '0.75rem',
-                                cursor: 'pointer',
-                                transition: 'all 0.2s',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              {tf.replace(' Weeks', 'w')}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                        <label style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>Team Size</label>
-                        <div style={{ display: 'flex', alignItems: 'center', background: '#090a0f', borderRadius: '6px', border: '1px solid #1e2230', overflow: 'hidden' }}>
-                          <button onClick={() => setTeamSize(Math.max(1, teamSize - 1))} style={{ padding: '0.5rem 0.75rem', background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}>-</button>
-                          <span style={{ flex: 1, textAlign: 'center', color: '#f3f4f6', fontSize: '0.875rem' }}>{teamSize}</span>
-                          <button onClick={() => setTeamSize(Math.min(5, teamSize + 1))} style={{ padding: '0.5rem 0.75rem', background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}>+</button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Ambition Toggle Group */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      <label style={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500 }}>Ambition Tier</label>
-                      <div style={{ display: 'flex', background: '#090a0f', borderRadius: '6px', border: '1px solid #1e2230', overflow: 'hidden', padding: '2px' }}>
-                        {Object.values(AmbitionLevel).map((al) => (
-                          <button
-                            key={al}
-                            onClick={() => setAmbition(al)}
-                            style={{
-                              flex: 1,
-                              padding: '0.5rem',
-                              background: ambition === al ? '#1e2230' : 'transparent',
-                              color: ambition === al ? '#f3f4f6' : '#64748b',
-                              border: 'none',
-                              borderRadius: '4px',
-                              fontSize: '0.75rem',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s',
-                            }}
-                          >
-                            {al === 'Practical' ? 'Minimalist' : al}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                        style={{
+                          padding: '0.75rem 1.25rem',
+                          background: '#2563eb',
+                          border: 'none',
+                          color: '#ffffff',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          fontFamily: 'monospace'
+                        }}
+                      >
+                        [ Continue ↵ ]
+                      </button>
+                    ) : (
+                      <CyberAction
+                        variant="primary"
+                        onClick={handleGenerate}
+                        disabled={skills.length === 0 || domains.length === 0 || state.isGenerating}
+                        ariaLabel="Generate capstone project blueprint"
+                      >
+                        {state.isGenerating ? '⏳ Synthesizing...' : '🚀 Generate Blueprint ↵'}
+                      </CyberAction>
+                    )}
                   </div>
-                </SurfaceCard>
+                </div>
 
-                {/* Stack Health Card */}
-                <SurfaceCard ariaLabel="Stack Health Indicator" as="section" style={{ padding: '1.25rem' }}>
-                  <h3 style={{ color: '#f3f4f6', fontSize: '0.875rem', fontWeight: 600, marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ color: '#06b6d4', animation: 'pulse-dot 2s infinite' }}>⚡</span> Stack Health & Feasibility
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.75rem' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#94a3b8' }}>Frontend Binding</span>
-                        <span style={{ color: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                          {skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '100% Configured' : 'Missing'}
-                        </span>
-                      </div>
-                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? '0 0 10px rgba(16,185,129,0.5)' : 'none' }} />
-                      </div>
-                    </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#94a3b8' }}>Backend SLA</span>
-                        <span style={{ color: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b' }}>
-                          {skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Active / Configured' : 'Missing'}
-                        </span>
-                      </div>
-                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#64748b', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '0 0 10px rgba(16,185,129,0.5)' : 'none' }} />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#94a3b8' }}>Database Layer</span>
-                        <span style={{ color: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#06b6d4' : '#F59E0B' }}>
-                          {skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? 'Configured' : 'Missing'}
-                        </span>
-                      </div>
-                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '100%' : '10%', background: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '#06b6d4' : '#F59E0B', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)', boxShadow: skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? '0 0 10px rgba(6,182,212,0.5)' : 'none' }} />
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#94a3b8' }}>AI/Data Engine</span>
-                        <span style={{ color: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#F59E0B') : '#64748b' }}>
-                          {skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 'Ready' : 'Missing Backend') : 'Inactive'}
-                        </span>
-                      </div>
-                      <div style={{ height: '4px', background: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '100%' : '50%') : '10%', background: skills.some(s => SKILL_GROUPS[3].skills.includes(s.tag)) ? (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? '#10b981' : '#F59E0B') : '#64748b', transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)' }} />
-                      </div>
-                    </div>
-                    
-                    <div style={{ marginTop: '0.5rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                      {(() => {
-                        if (skills.length === 0) {
-                          return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(203, 213, 225, 0.1)', border: '1px solid rgba(203, 213, 225, 0.2)', borderRadius: '6px', color: '#cbd5e1', fontSize: '0.75rem', fontWeight: 500 }}>
-                              Select core skills to evaluate stack health.
-                            </div>
-                          );
-                        }
-                        const coreCount = (skills.some(s => SKILL_GROUPS[1].skills.includes(s.tag)) ? 1 : 0) +
-                                          (skills.some(s => SKILL_GROUPS[2].skills.includes(s.tag)) ? 1 : 0) +
-                                          (skills.some(s => SKILL_GROUPS[5].skills.includes(s.tag)) ? 1 : 0);
-                        if (coreCount <= 1) {
-                          return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '6px', color: '#F59E0B', fontSize: '0.75rem', fontWeight: 500 }}>
-                              <span style={{ animation: 'pulse-dot 2s infinite' }}>●</span> Missing Core Layers: Frontend / Backend / Database
-                            </div>
-                          );
-                        } else if (coreCount === 2) {
-                          return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: '6px', color: '#06b6d4', fontSize: '0.75rem', fontWeight: 500 }}>
-                              <span style={{ animation: 'pulse-dot 3s ease-in-out infinite' }}>●</span> Partial Architecture: Add Data Layer or API Service
-                            </div>
-                          );
-                        } else {
-                          return (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem', background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '6px', color: '#10b981', fontSize: '0.75rem', fontWeight: 500 }}>
-                              ✓ Stack Balanced: Production Architecture Verified
-                            </div>
-                          );
-                        }
-                      })()}
-                    </div>
-                  </div>
-                </SurfaceCard>
-                
-                <DomainSelector selectedDomains={domains} onDomainsChange={setDomains} />
-              </div>
-
-              {/* Right Grid (col-span-8) */}
-              <div style={{ gridColumn: 'span 8', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                <SkillMatrixInput selectedSkills={skills} onSkillsChange={setSkills} />
-              </div>
-            </div>
-
-            {/* Generate button */}
-            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-              <CyberAction
-                variant="primary"
-                onClick={handleGenerate}
-                disabled={skills.length === 0 || domains.length === 0 || state.isGenerating}
-                ariaLabel="Generate capstone project blueprint"
-              >
-                {state.isGenerating ? '⏳ Synthesizing...' : '🚀 Generate Blueprint'}
-              </CyberAction>
-              {skills.length === 0 || domains.length === 0 ? (
-                <p style={{ color: '#64748B', fontSize: '0.8125rem', marginTop: '0.75rem' }}>
-                  Select at least 1 skill and 1 domain to generate.
-                </p>
-              ) : null}
-            </div>
 
             {/* Preset Blueprints */}
             <div style={{ marginTop: '3rem' }}>
@@ -538,7 +476,7 @@ export default function App(): React.JSX.Element {
               <p style={{ color: '#64748B', textAlign: 'center', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
                 Explore pre-built project blueprints or generate your own above.
               </p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
                 {state.presetBlueprints.map((preset) => (
                   <SurfaceCard key={preset.id} ariaLabel={`Preset: ${preset.title}`}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
@@ -563,7 +501,7 @@ export default function App(): React.JSX.Element {
                         {preset.feasibilityScore}% feasible
                       </span>
                     </div>
-                    <h4 style={{ color: '#F0F4F8', fontSize: '1rem', fontWeight: 700, margin: '0 0 0.5rem 0', lineHeight: 1.3 }}>
+                    <h4 style={{ color: '#f8fafc', fontSize: '1rem', fontWeight: 700, margin: '0 0 0.5rem 0', lineHeight: 1.3 }}>
                       {preset.title}
                     </h4>
                     <p style={{ color: '#94A3B8', fontSize: '0.8125rem', lineHeight: 1.5, margin: '0 0 1rem 0' }}>

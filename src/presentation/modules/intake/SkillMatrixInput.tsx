@@ -105,12 +105,31 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
 
   return (
     <SurfaceCard ariaLabel="Skill matrix input" as="section">
-      <h3 style={{ color: '#F0F4F8', fontSize: '1.125rem', fontWeight: 700, marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <h3 style={{ color: '#f8fafc', fontSize: '1.125rem', fontWeight: 700, marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span>🧬 Skill Taxonomy Matrix</span>
-        <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94a3b8', background: 'rgba(255,255,255,0.06)', padding: '2px 8px', borderRadius: '12px' }}>
-          Selected: {selectedSkills.length}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {selectedSkills.length > 0 && (
+            <button onClick={() => onSkillsChange([])} style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', fontSize: '0.6875rem', cursor: 'pointer', padding: '2px 8px', borderRadius: '4px', transition: 'all 0.2s' }}>
+              Clear All
+            </button>
+          )}
+          <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#94a3b8', background: 'rgba(255,255,255,0.06)', padding: '2px 8px', borderRadius: '12px' }}>
+            Selected: {selectedSkills.length}
+          </span>
+        </div>
       </h3>
+
+      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '4px' }}>
+        <button onClick={() => onSkillsChange([...selectedSkills.filter(s => !['React','Node.js','PostgreSQL'].includes(s.tag)), {tag:'React',proficiency:ProficiencyLevel.Intermediate}, {tag:'Node.js',proficiency:ProficiencyLevel.Intermediate}, {tag:'PostgreSQL',proficiency:ProficiencyLevel.Intermediate}])} style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.15)', border: '1px solid rgba(59, 130, 246, 0.3)', borderRadius: '6px', color: '#60a5fa', fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          ⚡ Modern Web
+        </button>
+        <button onClick={() => onSkillsChange([...selectedSkills.filter(s => !['Next.js','FastAPI','LangChain','Vector DBs (Chroma/Pinecone)'].includes(s.tag)), {tag:'Next.js',proficiency:ProficiencyLevel.Intermediate}, {tag:'FastAPI',proficiency:ProficiencyLevel.Intermediate}, {tag:'LangChain',proficiency:ProficiencyLevel.Intermediate}, {tag:'Vector DBs (Chroma/Pinecone)',proficiency:ProficiencyLevel.Intermediate}])} style={{ padding: '6px 12px', background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '6px', color: '#34d399', fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          🧠 AI/LLM Pipeline
+        </button>
+        <button onClick={() => onSkillsChange([...selectedSkills.filter(s => !['React','Spring Boot','MySQL'].includes(s.tag)), {tag:'React',proficiency:ProficiencyLevel.Intermediate}, {tag:'Spring Boot',proficiency:ProficiencyLevel.Intermediate}, {tag:'MySQL',proficiency:ProficiencyLevel.Intermediate}])} style={{ padding: '6px 12px', background: 'rgba(245, 158, 11, 0.15)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '6px', color: '#fbbf24', fontSize: '0.75rem', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+          🛡️ Enterprise Cloud
+        </button>
+      </div>
 
       <div style={{ marginBottom: '1rem' }}>
         <input 
@@ -119,13 +138,13 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && !exactMatchExists && handleAddCustomSkill()}
           placeholder="Search 50+ technologies or type custom..." 
-          style={{ width: '100%', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', borderRadius: '8px', transition: 'all 0.2s', outline: 'none' }}
+          style={{ width: '100%', padding: '0 0.75rem', height: '2.25rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.1)', color: '#FFF', borderRadius: '8px', transition: 'all 0.2s', outline: 'none' }}
           onFocus={(e) => { e.currentTarget.style.borderColor = '#06b6d4'; }}
           onBlur={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
         />
         
         {/* Category Filters */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.625rem', overflowX: 'auto', paddingBottom: '0.25rem' }}>
           <button
             onClick={() => setActiveCategory('All')}
             style={{
@@ -175,9 +194,9 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
                     <button
                       onClick={() => handleSkillToggle(skill)}
                       style={{
-                        background: isSelected(skill) ? `${profColor}20` : 'rgba(255,255,255,0.03)',
-                        border: isSelected(skill) ? `1px solid ${profColor}` : '1px solid rgba(255,255,255,0.08)',
-                        color: isSelected(skill) ? profColor : '#CBD5E1',
+                        background: isSelected(skill) ? 'rgba(6, 182, 212, 0.4)' : 'rgba(255,255,255,0.03)',
+                        border: isSelected(skill) ? '1px solid #06b6d4' : '1px solid rgba(255,255,255,0.08)',
+                        color: isSelected(skill) ? '#ffffff' : '#CBD5E1',
                         padding: '0.375rem 0.75rem',
                         borderRadius: '20px',
                         cursor: 'pointer',
@@ -228,7 +247,7 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
           </div>
         )}
 
-      <div style={{ maxHeight: '460px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+      <div style={{ maxHeight: '280px', overflowY: 'auto', paddingRight: '0.5rem' }}>
         <style>{`
           .custom-scroll::-webkit-scrollbar { width: 4px; }
           .custom-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -237,9 +256,11 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
         <div className="custom-scroll" style={{ display: 'flex', flexDirection: 'column' }}>
         {filteredGroups.map((group) => (
           <div key={group.category} style={{ marginBottom: '1.25rem' }}>
-            <h4 style={{ color: '#8B5CF6', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
-              {group.category}
-            </h4>
+            {activeCategory === 'All' && (
+              <h4 style={{ color: '#22d3ee', fontSize: '10px', fontFamily: 'monospace', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.2em', marginBottom: '0.625rem' }}>
+                {group.category}
+              </h4>
+            )}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               {group.skills.map((skill) => {
                 const prof = getProficiency(skill);
@@ -249,9 +270,9 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
                     <button
                       onClick={() => handleSkillToggle(skill)}
                       style={{
-                        background: isSelected(skill) ? `${profColor}20` : 'rgba(255,255,255,0.03)',
-                        border: isSelected(skill) ? `1px solid ${profColor}` : '1px solid rgba(255,255,255,0.08)',
-                        color: isSelected(skill) ? profColor : '#CBD5E1',
+                        background: isSelected(skill) ? 'rgba(6, 182, 212, 0.4)' : 'rgba(255,255,255,0.03)',
+                        border: isSelected(skill) ? '1px solid #06b6d4' : '1px solid rgba(255,255,255,0.08)',
+                        color: isSelected(skill) ? '#ffffff' : '#CBD5E1',
                         padding: '0.375rem 0.75rem',
                         borderRadius: '20px',
                         cursor: 'pointer',

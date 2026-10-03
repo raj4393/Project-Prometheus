@@ -69,7 +69,7 @@ export function DomainSelector({ selectedDomains, onDomainsChange }: DomainSelec
         Select 1–3 domains that align with your interests. These guide the project theme.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.625rem' }}>
         {DOMAIN_META.map(({ pillar, icon, description }) => {
           const selected = isSelected(pillar);
           return (
@@ -83,7 +83,7 @@ export function DomainSelector({ selectedDomains, onDomainsChange }: DomainSelec
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 gap: '0.375rem',
-                padding: '1rem',
+                padding: '0.625rem',
                 borderRadius: '12px',
                 border: selected
                   ? '1px solid #00F5A0'

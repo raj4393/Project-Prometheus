@@ -42,11 +42,9 @@ export function SurfaceCard({
   const Tag = as;
 
   const baseStyle: CSSProperties = {
-    background: 'rgba(11, 18, 32, 0.85)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    borderRadius: '16px',
-    backdropFilter: 'blur(24px)',
-    WebkitBackdropFilter: 'blur(24px)',
+    background: '#111827',
+    border: '1px solid #1f2937',
+    borderRadius: '8px',
     padding: '1.5rem',
     transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
     ...style,

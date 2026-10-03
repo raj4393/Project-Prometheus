@@ -80,9 +80,7 @@ export function Navbar({ activeTab, onTabChange, engineStatus: _engineStatus, is
         justifyContent: 'space-between',
         height: '3.5rem',
         padding: '0 1.5rem',
-        background: 'rgba(5, 6, 8, 0.9)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        background: '#000000',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         position: 'sticky',
         top: 0,
@@ -105,32 +103,12 @@ export function Navbar({ activeTab, onTabChange, engineStatus: _engineStatus, is
         }}>
           PROMETHEUS
         </h1>
-        <span style={{ 
-          background: 'rgba(6, 182, 212, 0.1)',
-          color: '#22d3ee',
-          fontSize: '10px',
-          padding: '2px 8px',
-          borderRadius: '9999px',
-          border: '1px solid rgba(6, 182, 212, 0.3)'
-        }}>
-          CAPSTONE OS v2.0
-        </span>
+
       </div>
 
       {/* Center: Pipeline Stepper */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', position: 'relative' }} role="tablist">
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          width: '120px',
-          background: 'rgba(255,255,255,0.06)',
-          borderRadius: '9999px',
-          zIndex: 0,
-          transition: 'transform 400ms cubic-bezier(0.16, 1, 0.3, 1), width 400ms cubic-bezier(0.16, 1, 0.3, 1)',
-          transform: `translateX(${NAV_TABS.findIndex(t => t.id === activeTab) * (120 + 8)}px)`,
-        }} />
+        <div style={{ display: 'none' }} />
         
         {NAV_TABS.map((tab, index) => {
           const isActive = activeTab === tab.id;
@@ -160,10 +138,7 @@ export function Navbar({ activeTab, onTabChange, engineStatus: _engineStatus, is
                   zIndex: 1,
                 }}
               >
-                {isActive && <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#06b6d4' }} />}
-                {isPassed && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
-                {!isActive && !isPassed && <span style={{ opacity: 0.5 }}>0{index + 1}</span>}
-                <span className="hide-on-mobile">{isActive ? `0${index + 1} ${tab.label}` : tab.label}</span>
+                <span className="hide-on-mobile">{isActive ? `${index + 1}. ${tab.label}` : `${index + 1}. ${tab.label}`}</span>
               </button>
               {index < NAV_TABS.length - 1 && (
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
