@@ -2,7 +2,7 @@ import React from 'react';
 /**
  * @module StoreContext
  * @description Strongly typed React Context and action dispatcher providing
- * global state management for the Project Prometheus application.
+ * global state management for the Archon OS application.
  * Wraps the projectReducer in a context provider with memoized dispatch.
  */
 

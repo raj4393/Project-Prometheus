@@ -35,7 +35,7 @@ import { AcademicRubric } from './presentation/modules/academic/AcademicRubric';
 import { FacultyGradingPanel } from './presentation/modules/assessment/FacultyGradingPanel';
 
 /**
- * Root application component rendering the Project Prometheus platform.
+ * Root application component rendering the Archon OS platform.
  * Manages intake form state, synthesis orchestration, and view routing.
  *
  * @returns The complete application interface

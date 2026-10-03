@@ -121,7 +121,7 @@ describe('generateIEEEMarkdown', () => {
 
   it('should include the footer signature', () => {
     const markdown = generateIEEEMarkdown(TEST_BLUEPRINT, null, 'Student');
-    expect(markdown).toContain('Project Prometheus');
+    expect(markdown).toContain('Archon OS');
   });
 
   it('should use "Student" as default author when name is empty', () => {

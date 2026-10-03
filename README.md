@@ -24,7 +24,7 @@ The platform is strictly evaluated across 7 core vectors: **Code Quality, Securi
 
 ## 🏗️ Architecture Topology
 
-Project Prometheus avoids traditional monolithic bottlenecks by employing a cleanly separated, decoupled frontend architecture that thrives entirely within the browser. 
+Archon OS avoids traditional monolithic bottlenecks by employing a cleanly separated, decoupled frontend architecture that thrives entirely within the browser. 
 
 The application is structured into four primary layers:
 

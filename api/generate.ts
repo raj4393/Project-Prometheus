@@ -12,7 +12,7 @@ export default {
   async fetch(request: Request): Promise<Response> {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: 'Service Unavailable' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+      return new Response(JSON.stringify({ error: 'Internal Server Error', details: 'Missing GEMINI_API_KEY environment variable' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 
     if (request.method !== 'POST') {

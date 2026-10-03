@@ -57,7 +57,7 @@ function mapEngineStatusToBadge(status: EngineStatus): 'online' | 'offline' | 'w
 
 /**
  * Navigation bar with live engine status and tab navigation.
- * Shows the Project Prometheus branding, navigation tabs,
+ * Shows the Archon OS branding, navigation tabs,
  * and real-time AI engine connection indicator.
  *
  * @param props - Component configuration
