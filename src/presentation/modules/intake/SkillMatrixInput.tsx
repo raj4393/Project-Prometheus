@@ -228,6 +228,13 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
           </div>
         )}
 
+      <div style={{ maxHeight: '460px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+        <style>{`
+          .custom-scroll::-webkit-scrollbar { width: 4px; }
+          .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+          .custom-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        `}</style>
+        <div className="custom-scroll" style={{ display: 'flex', flexDirection: 'column' }}>
         {filteredGroups.map((group) => (
           <div key={group.category} style={{ marginBottom: '1.25rem' }}>
             <h4 style={{ color: '#8B5CF6', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
@@ -280,6 +287,8 @@ export function SkillMatrixInput({ selectedSkills, onSkillsChange }: SkillMatrix
             </div>
           </div>
         ))}
+        </div>
+      </div>
       </div>
     </SurfaceCard>
   );

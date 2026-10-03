@@ -16,7 +16,7 @@ const NAV_TABS: ReadonlyArray<{ id: ActiveTab; label: string }> = [
   { id: 'intake', label: 'Scope' },
   { id: 'blueprint', label: 'Topology' },
   { id: 'roadmap', label: 'Roadmap' },
-  { id: 'defense', label: 'Viva' },
+  { id: 'defense', label: 'Viva Voce' },
   { id: 'assessment', label: 'Review' },
 ];
 
@@ -80,7 +80,7 @@ export function Navbar({ activeTab, onTabChange, engineStatus: _engineStatus, is
         justifyContent: 'space-between',
         height: '3.5rem',
         padding: '0 1.5rem',
-        background: 'rgba(7, 8, 10, 0.9)',
+        background: 'rgba(5, 6, 8, 0.9)',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
@@ -113,7 +113,7 @@ export function Navbar({ activeTab, onTabChange, engineStatus: _engineStatus, is
           borderRadius: '9999px',
           border: '1px solid rgba(6, 182, 212, 0.3)'
         }}>
-          CAPSTONE OS v1.0
+          CAPSTONE OS v2.0
         </span>
       </div>
 

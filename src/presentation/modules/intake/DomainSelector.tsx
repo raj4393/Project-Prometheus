@@ -69,7 +69,7 @@ export function DomainSelector({ selectedDomains, onDomainsChange }: DomainSelec
         Select 1–3 domains that align with your interests. These guide the project theme.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
         {DOMAIN_META.map(({ pillar, icon, description }) => {
           const selected = isSelected(pillar);
           return (
@@ -100,15 +100,12 @@ export function DomainSelector({ selectedDomains, onDomainsChange }: DomainSelec
                 boxShadow: selected ? '0 0 20px rgba(0, 245, 160, 0.15)' : 'none',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', justifyContent: 'center' }}>
                 <span style={{ fontSize: '1.25rem' }} aria-hidden="true">{icon}</span>
-                <span style={{ fontWeight: 600, fontSize: '0.875rem', color: selected ? '#00F5A0' : '#F0F4F8' }}>
+                <span style={{ fontWeight: 600, fontSize: '0.75rem', color: selected ? '#00F5A0' : '#F0F4F8' }}>
                   {pillar}
                 </span>
               </div>
-              <span style={{ fontSize: '0.75rem', color: '#64748B', lineHeight: 1.4 }}>
-                {description}
-              </span>
             </button>
           );
         })}
