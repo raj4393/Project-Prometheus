@@ -31,3 +31,5 @@ scratch
 
 *.tsbuildinfo
 .vercel
+
+api/*.js
